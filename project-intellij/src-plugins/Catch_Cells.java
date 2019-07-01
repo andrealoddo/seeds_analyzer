@@ -12,6 +12,7 @@ import ij.plugin.Thresholder;
 
 import java.lang.String;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.awt.Polygon;
@@ -52,6 +53,7 @@ import java.util.Arrays;
             cells_analyzer.run(imp.getProcessor());
             /*visualizzazione dei risultati*/
             Analyzer.getResultsTable().show("Results");
+
         }
 
         /*Per poter spillare HSB*/
@@ -93,22 +95,26 @@ import java.util.Arrays;
         class Cells_Analyzer extends ParticleAnalyzer {
             int measure = 0;
 
-            private boolean[] measureImageJ = new boolean[9];
-            /*Vettore per checkBox B&W*/
-            private boolean[] measuresBW = new boolean[26];
+            /* Feature di default ImageJ */
+            private boolean[] measureImageJ = new boolean[7];
+
+            /* Feature morfologiche implementate ex novo da Marta */
+            private boolean[] measuresBW = new boolean[30];
             /*CheckBox Misure aggiunte B&W*/
-            private boolean doConvexArea, doConvexPerimeter, doMINRMAXR,
-                    doAspRatio, doRoundness,
-                    doArEquivD, doPerEquivD, doEquivEllAr,
-                    doCompactness, doSolidity, doConcavity,
-                    doConvexity, doShape, doRFactor,
-                    doArBBox, doRectang, doModRatio,
-                    doSphericity, doElongation, doNormPeriIndex,
-                    doHaralickRatio, doBendingEnergy,
-                    doEndocarp, doIS, doDS, doTest;
+            private boolean doConvexArea, doConvexPerimeter, doArEquivD,
+                    doAspRatio, doPerEquivD, doMINRMAXR,
+                    doRoundness, doEquivEllAr, doCompactness,
+                    doSolidity, doShape, doRFactor,
+                    doConvexity, doConcavity, doArBBox,
+                    doRectang, doModRatio, doSphericity,
+                    doElongation, doNormPeriIndex, doHaralickRatio,
+                    doBendingEnergy,
 
+                    doIS, doDS,
+                    doJaggedness, doEndocarp, doBreadth,
+                    doMeanRadius, doVarianceR, doCircularity;
 
-            /*Vettore per checkBox GREY*/
+            /* Feature texturali implementate ex novo da Marta */
             private boolean[] measuresGrey = new boolean[13];
             /*CheckBox Misure aggiunte GREY*/
             private boolean doMean, doSkewness, doKurtois,
@@ -116,6 +122,7 @@ import java.util.Arrays;
                     doSquareIntensitySum, doUniformity, doVariance, doStandardDeviation,
                     doSmothness, doMinandMax;
 
+            /* Feature di colore implementate ex novo da Marta */
             private boolean[] measureRGB = new boolean[16];
             private boolean doMeanRed, doMeanGreen, doMeanBlue,
                             doStdDeviationRed, doStdDeviationGreen, doStdDeviationBlue,
@@ -148,10 +155,12 @@ import java.util.Arrays;
             private boolean dialogSetMeasurements() {
                 GenericDialog gd = new GenericDialog("Measures", IJ.getInstance());
                 Font font = new Font("font", Font.ITALIC, 16);
+                Font fontSpace = new Font("font", Font.PLAIN, 8);
+
                 gd.addMessage("Select the measures for B&W", font, Color.black);
-                String[] labels = new String[9];
-                boolean[] states = new boolean[9];
-                gd.addCheckbox("Select All", false);
+                String[] labels = new String[7];
+                boolean[] states = new boolean[7];
+                gd.addCheckbox("Select All", true);
                 labels[0] = "Area                  ";
                 states[0] = false;
                 labels[1] = "Centroid              ";
@@ -164,25 +173,24 @@ import java.util.Arrays;
                 states[4] = false;
                 labels[5] = "Fit ellipse           ";
                 states[5] = false;
-                labels[6] = "Shape descriptors     ";
+                labels[6] = "Feret's diameter      ";
                 states[6] = false;
-                labels[7] = "Feret's diameter      ";
-                states[7] = false;
-                labels[8] = "Stack position       ";
-                states[8] = false;
+                //labels[7] = "Shape descriptors     ";
+                //states[7] = false;
 
                 gd.setInsets(1, 0, 0);
-                gd.addCheckboxGroup(4, 3, labels, states);
+                gd.addCheckboxGroup(2, 4, labels, states);
+                gd.addMessage(" ", fontSpace, Color.black);
 
-                String[] labels1 = new String[14];
-                boolean[] states1 = new boolean[14];
+                String[] labels1 = new String[12];
+                boolean[] states1 = new boolean[12];
                 labels1[0] = "Convex Area*           ";
                 states1[0] = false;
-                labels1[1] = "Convex Perimeter*      ";
+                labels1[1] = "Convex Perimeter*     ";
                 states1[1] = false;
                 labels1[2] = "ArEquivD*             ";
                 states1[2] = false;
-                labels1[3] = "AspRatio*             ";
+                labels1[3] = "AspRatio*              ";
                 states1[3] = false;
                 labels1[4] = "PerEquivD*            ";
                 states1[4] = false;
@@ -196,54 +204,71 @@ import java.util.Arrays;
                 states1[8] = false;
                 labels1[9] = "Solidity*             ";
                 states1[9] = false;
-                labels1[10] = "Shape*               ";
+                labels1[10] = "ThinnessR*               ";
                 states1[10] = false;
+                labels1[11] = "RFactor*                ";
+                states1[11] = false;
 
-                gd.setInsets(1, 0, 0);
-                gd.addCheckboxGroup(4, 3, labels1, states1);
+                gd.setInsets(0, 0, 0);
+                gd.addCheckboxGroup(3, 4, labels1, states1);
+                gd.addMessage(" ", fontSpace, Color.black);
 
                 String[] labels2 = new String[12];
                 boolean[] states2 = new boolean[12];
-                labels2[0] = "Convexity*              ";
+                labels2[0] = "Convexity*             ";
                 states2[0] = false;
-                labels2[1] = "RFactor*                ";
+                labels2[1] = "Concavity*              ";
                 states2[1] = false;
-                labels2[2] = "ArBBox*                 ";
+                labels2[2] = "ArBBox*                ";
                 states2[2] = false;
-                labels2[3] = "Concavity*              ";
+                labels2[3] = "Rectang*               ";
                 states2[3] = false;
-                labels2[4] = "Rectang*                ";
+                labels2[4] = "ModRatio*              ";
                 states2[4] = false;
-                labels2[5] = "ModRatio*               ";
+                labels2[5] = "Sphericity*            ";
                 states2[5] = false;
-                labels2[6] = "Sphericity*             ";
+                labels2[6] = "Elongation*            ";
                 states2[6] = false;
-                labels2[7] = "Elongation*             ";
+                labels2[7] = "NormPeriIndex*         ";
                 states2[7] = false;
-                labels2[8] = "NormPeriIndex*          ";
+                labels2[8] = "HaralickRatio*         ";
                 states2[8] = false;
-                labels2[9] = "HaralickRatio*          ";
+                labels2[9] = "Bending Energy*        ";
                 states2[9] = false;
-                labels2[10] = "Bending Energy*        ";
+                labels2[10] = "IS**        ";
                 states2[10] = false;
-                labels2[11] = "Test*                  ";
+                labels2[11] = "DS**        ";
                 states2[11] = false;
 
-                /*labels1[11] = "Endocarp**          ";
-                states1[11] = false;
-                labels1[12] = "IS**          ";
-                states1[12] = false;
-                labels1[13] = "DS**            ";
-                states1[13] = false;*/
                 gd.setInsets(0, 0, 0);
                 gd.addCheckboxGroup(3, 4, labels2, states2);
+                gd.addMessage(" ", fontSpace, Color.black);
+
+                String[] labels5 = new String[6];
+                boolean[] states5 = new boolean[6];
+                labels5[0] = "Jaggedness**       ";
+                states5[0] = false;
+                labels5[1] = "Endocarp**              ";
+                states5[1] = false;
+                labels5[2] = "Breadth**               ";
+                states5[2] = false;
+                labels5[3] = "MeanRadius**            ";
+                states5[3] = false;
+                labels5[4] = "VarianceRadius**        ";
+                states5[4] = false;
+                labels5[5] = "Circularity**           ";
+                states5[5] = false;
+
+                gd.setInsets(0, 0, 0);
+                gd.addCheckboxGroup(2, 4, labels5, states5);
+                gd.addMessage(" ", fontSpace, Color.black);
 
                 gd.addMessage("Select the measures for Grey", font, Color.GRAY);
 
                 if(typeRGB){
                     String[] labels3 = new String[12];
                     boolean[] states3 = new boolean[12];
-                    gd.addCheckbox("Select All", false);
+                    gd.addCheckbox("Select All", true);
                     labels3[0] = "Mean                      ";
                     states3[0] = false;
                     labels3[1] = "Skewness                  ";
@@ -274,7 +299,7 @@ import java.util.Arrays;
                 {
                     String[] labels3 = new String[13];
                     boolean[] states3 = new boolean[13];
-                    gd.addCheckbox("Select All", false);
+                    gd.addCheckbox("Select All", true);
                     labels3[0] = "Mean                      ";
                     states3[0] = false;
                     labels3[1] = "Skewness                  ";
@@ -308,7 +333,7 @@ import java.util.Arrays;
                 if(typeRGB){
                     gd.addMessage("Select the measures for RGB", font, Color.red);
                    // gd.addMessage("Select the measures", font, colors[0]+ "for RGB implemented", font, colors[1]);
-                    gd.addCheckbox("Select All", false);
+                    gd.addCheckbox("Select All", true);
                     String[] labels4 = new String[16];
                     boolean[] states4 = new boolean[16];
                     labels4[0] = "R mean*                      ";
@@ -410,12 +435,9 @@ import java.util.Arrays;
                             measureRGB[i] = gd.getNextBoolean();
                         }
                     }
-
                 }
-
                 return true;
             }
-
 
             /**/
             private void setMeasurementsExtended() {
@@ -439,20 +461,13 @@ import java.util.Arrays;
                     measure += ELLIPSE;
                 }
                 if (measureImageJ[6]) {
-                    measure += SHAPE_DESCRIPTORS;
-                }
-                if (measureImageJ[7]) {
                     measure += FERET;
                 }
                 /*
-                if (measureImageJ[8]) {
-                    measure += INTEGRATED_DENSITY;
+                if (measureImageJ[7]) {
+                    measure += SHAPE_DESCRIPTORS;
                 }
                 */
-                if (measureImageJ[8]) {
-                    measure += STACK_POSITION;
-                }
-
 
                 /*Misure BW*/
                 doConvexArea = measuresBW[0];
@@ -466,10 +481,10 @@ import java.util.Arrays;
                 doCompactness = measuresBW[8];
                 doSolidity = measuresBW[9];
                 doShape = measuresBW[10];
-                doConvexity = measuresBW[11];
-                doRFactor = measuresBW[12];
-                doArBBox = measuresBW[13];
-                doConcavity = measuresBW[14];
+                doRFactor = measuresBW[11];
+                doConvexity = measuresBW[12];
+                doConcavity = measuresBW[13];
+                doArBBox = measuresBW[14];
                 doRectang = measuresBW[15];
                 doModRatio = measuresBW[16];
                 doSphericity = measuresBW[17];
@@ -477,9 +492,16 @@ import java.util.Arrays;
                 doNormPeriIndex = measuresBW[19];
                 doHaralickRatio = measuresBW[20];
                 doBendingEnergy = measuresBW[21];
-                doEndocarp = measuresBW[22];
-                doIS = measuresBW[23];
-                doDS = measuresBW[24];
+
+                // new features, specific for seeds analysis
+                doIS = measuresBW[22];
+                doDS = measuresBW[23];
+                doJaggedness = measuresBW[24];
+                doEndocarp = measuresBW[25];
+                doBreadth = measuresBW[26];
+                doMeanRadius = measuresBW[27];
+                doVarianceR = measuresBW[28];
+                doCircularity = measuresBW[29];
 
                 doMean = measuresGrey[0];
                 doSkewness = measuresGrey[1]; if (doSkewness) { measure += SKEWNESS; }
@@ -526,51 +548,54 @@ import java.util.Arrays;
                 double[] feret = roi.getFeretValues(); //0 --> feret , 1 --> angle, 2 --> feret min
                 double perim = roi.getLength();
                 int[] hist = stats.histogram;
+                double[] radiiValues = getRadiiValues(roi, stats.xCenterOfMass, stats.yCenterOfMass);
 
-                if (doConvexArea) {//Area of the convex hull polygon
+                if (doConvexArea) { //Area of the convex hull polygon
                     rt.addValue("*ConvexArea", convexArea);
                 }
+
                 if (doConvexPerimeter) { //Perimeter of the convex hull polygon
                     rt.addValue("*ConvexPerimeter", convexPerimeter);
                 }
+
+                if (doArEquivD) //Diameter of a circle with equivalent area,
+                    rt.addValue("*ArEquivD", Math.sqrt((4 * pigreco) * stats.area));
+
+                if (doAspRatio) //Aspect ratio = Feret/Breadth = L/W also called Feret ratio or Eccentricity or Rectangular ratio
+                    rt.addValue("*AspRatio", feret[0] / feret[2]);
+
+                if (doPerEquivD) //Diameter of a circle with equivalent perimeter,  Area/?
+                    rt.addValue("*PerEquivD", stats.area / pigreco);
 
                 if (doMINRMAXR) { //
                     rt.addValue("*MinR", feret[2] / 2); //DA RIVEDERE Radius of the inscribed circle centred at the middle of mass
                     rt.addValue("*MaxR", feret[0] / 2); //DA RIVEDERE Radius of the enclosing circle centred at the middle of mass
                 }
 
-                if (doAspRatio) //Aspect ratio = Feret/Breadth = L/W also called Feret ratio or Eccentricity or Rectangular ratio
-                    rt.addValue("*AspRatio", feret[0] / feret[2]);
-
                 if (doRoundness) //Roundness = 4�Area/(?�Feret2)
                     rt.addValue("*Roundness", (stats.area * 4) / ((pigreco) * (feret[0] * feret[0])));
-
-                if (doArEquivD) //Diameter of a circle with equivalent area,
-                    rt.addValue("*ArEquivD", Math.sqrt((4 * pigreco) * stats.area));
-
-                if (doPerEquivD) //Diameter of a circle with equivalent perimeter,  Area/?
-                    rt.addValue("*PerEquivD", stats.area / pigreco);
 
                 if (doEquivEllAr) //Area of the ellipse with Feret and Breath as major and minor axis,  = (?�Feret�Breadth)/4
                     rt.addValue("*EquivEllAr", (pigreco * feret[0] * feret[2]) / 4);
 
-                if (doCompactness) //Compactness = ?((4/?)�Area)/Feret
+                if (doCompactness) //Compactness = sqrt((4/pi)*Area)/Feret
                     rt.addValue("*Compactness", (Math.sqrt((4 / pigreco) * stats.area)) / feret[0]);
 
-                if (doSolidity) //Compactness = ?((4/?)�Area)/Feret
+                if (doSolidity) //Solidity = Area/ConvexArea
                     rt.addValue("*Solidity", (stats.area / convexArea));
 
-                if (doConcavity) //Concavity ConvexArea-Area
-                    rt.addValue("*Concavity", convexArea - stats.area);
-
-                if (doConvexity) //Convexity = Convex_Perim/Perimeter also called rugosity or roughness
-                    rt.addValue("*Convexity", convexPerimeter / perim);
-
                 if (doShape) //Shape = Perimeter2/Area also called Thinness ratio
-                    rt.addValue("*Shape", (perim * perim) / stats.area);
+                    rt.addValue("*ThinnessR", (perim * perim) / stats.area);
 
                 if (doRFactor) //RFactor = Convex_Area /(Feret�?)
                     rt.addValue("*RFactor", convexArea / (feret[0] * pigreco));
+
+                // End of "Labels1". Start of "Labels2"
+                if (doConvexity) //Convexity = Convex_Perim/Perimeter also called rugosity or roughness
+                    rt.addValue("*Convexity", convexPerimeter / perim);
+
+                if (doConcavity) //Concavity ConvexArea-Area
+                    rt.addValue("*Concavity", convexArea - stats.area);
 
                 if (doArBBox) //Area of the bounding box along the Feret diameter = Feret�Breadth
                     rt.addValue("*ArBBox", feret[0] * feret[2]);
@@ -598,14 +623,32 @@ import java.util.Arrays;
                     double be = getBendingEnergy(polygon);
                     rt.addValue("*Bending Energy", be);
                 }
-                if (doEndocarp) {
-                    rt.addValue("*Endocarp", 1);
-                }
                 if (doIS) {
-                    rt.addValue("*IS", 1);
+                    int[] intersectionIS = getIS(roi);
+                    rt.addValue("IS: x", intersectionIS[0]);
+                    rt.addValue("IS: y", intersectionIS[1]);
                 }
                 if (doDS) {
-                    rt.addValue("*DS", 1);
+                    int[] intersectionIS = getIS(roi);
+                    rt.addValue("DS",getDS(roi, intersectionIS, stats.xCenterOfMass, stats.yCenterOfMass));
+                }
+                if (doJaggedness) {
+                    rt.addValue("*Jaggedness", (2*Math.sqrt(Math.PI*stats.area))/perim);
+                }
+                if (doEndocarp) {
+                    rt.addValue("*Endocarp", stats.area - perim);
+                }
+                if (doBreadth) {
+                    rt.addValue("*Breadth", feret[2]);
+                }
+                if (doMeanRadius) {
+                    rt.addValue("*MeanR", radiiValues[2]);
+                }
+                if (doVarianceR) {
+                    rt.addValue("*VarianceR", radiiValues[3]);
+                }
+                if (doCircularity) {  // 4pi*area/perimeter^2
+                    rt.addValue("*Circularity", (4*Math.PI*stats.area)/Math.pow(perim,2));
                 }
 
                 /*Grey*/
@@ -712,14 +755,36 @@ import java.util.Arrays;
                     if(doStdDeviationS)rt.addValue("***Saturation color std deviation", stats_sa.stdDev);
                     if(doStdDeviationBr)rt.addValue("***Brightness color std deviation", stats_br.stdDev);
 
+
+                }
+            }
+
+            private double getArea(Polygon p) {
+                if (p == null) return Double.NaN;
+                double carea = 0.0;
+
+                for (int i = 0; i <= p.npoints - 2; i++) {
+                    carea += (p.xpoints[i] * p.ypoints[i+1]) - (p.xpoints[i+1] * p.ypoints[i]);
+                }
+                return (Math.abs(carea / 2.0));
+            }
+
+            private final double getPerimeter(Polygon p) {
+                if (p == null) return Double.NaN;
+                double cperimeter = 0.0;
+
+                for (int i = 0; i <= p.npoints - 2; i++) {
+                    cperimeter += distance(p.xpoints[i+1], p.ypoints[i+1], p.xpoints[i], p.ypoints[i]);
                 }
 
+                return cperimeter;
             }
+
 
             /*Riguardante ConvexHull-
              * Rivisitazione del metodo getArea da Analyzer(super-super classe) per cui dati i punti del poligono calcola l'area
              * trattandolo come se fosse composto da danti piccoli triangoli*/
-            private double getArea(Polygon p) {
+            private double getAreaOld(Polygon p) {
                 if (p == null) return Double.NaN;
                 int carea = 0;
                 int iminus1;
@@ -734,7 +799,7 @@ import java.util.Arrays;
 
             /*Riguardante ConvexHull-
              * Calcolo del perimetro dato i punti del poligono e calcolando le distanze tra i punti*/
-            private final double getPerimeter(Polygon p) {
+            private final double getPerimeterOld(Polygon p) {
                 if (p == null) return Double.NaN;
 
                 double cperimeter = 0.0;
@@ -938,6 +1003,105 @@ import java.util.Arrays;
                     result[i] = Math.pow(a[i], elevation);
                 }
                 return result;
+            }
+
+            /* Metodi Giorgia */
+            private double[] getRadiiValues(Roi roi, double x_cg, double y_cg){
+                Polygon p = roi.getPolygon();
+                int n = p.npoints;
+                int i;
+                int impHeight = imp.getHeight();
+                double sumR = 0;
+                double variance = 0;
+                double[] radii = new double[n];
+                double[] radiiValues = new double[5]; //minR, maxR, media, variance, stdDev
+                radiiValues[0] = Double.MAX_VALUE; //min
+                radiiValues[1] = -1; //max
+
+                for(i = 0; i < n; i++){
+                    radii[i] = distance((int)x_cg, (int)y_cg, p.xpoints[i],impHeight -p.ypoints[i]);
+
+                    if(radii[i] < radiiValues[0])
+                        radiiValues[0] = radii[i];
+                    if(radii[i] > radiiValues[1])
+                        radiiValues[1] = radii[i];
+                    sumR+= radii[i];
+                }
+
+                double media = sumR/n;
+                radiiValues[2] = media;
+
+                for(i = 0; i < n; i++){
+                    variance += (radii[i] - media) * (radii[i] - media);
+                }
+                variance /= (n - 1);
+                radiiValues[3] = variance;
+                radiiValues[4] = Math.sqrt(variance); //std deviation
+                return  radiiValues;
+            }
+
+            private double getDS(Roi roi, int[] is, double x_cg, double y_cg){
+                //double ds = Math.sqrt(Math.pow((is[0] - x_cg), 2.0) + Math.pow((is[1] - y_cg), 2.0));
+                Point2D.Double pIs = new Point2D.Double(is[0], is[1]);
+                Point2D.Double pCg = new Point2D.Double(x_cg, y_cg);
+                double ds = pIs.distance(pCg);
+                return ds;
+            }
+
+            private int[] getIS(Roi roi){
+                int impHeight = imp.getHeight();
+                int impWidth = imp.getWidth();
+                Rectangle r = roi.getBounds();
+                int bbCenterX = r.x + r.width/2;
+                int bbCenterY = impHeight - r.y - r.height/2;
+                int realX = r.x;
+                int realY = impHeight - r.y;
+
+                int[] startH = new int[2];
+                int[] endH = new int[2];
+                int[] startW = new int[2];
+                int[] endW = new int[2];
+                double s1, s2;
+                int[] IS = new int[2];
+
+                for(int i = realX; i < realX + r.width; i++) {
+                    if (roi.contains(i, realY)) {
+                        startH[0] = i;
+                        startH[1] = realY;
+                        break;
+                    }
+                }
+                for(int i = realX; i < realX + r.width; i++){
+                    if(roi.contains(i, realY - r.height)){
+                        endH[0] = i;
+                        endH[1] = realY - r.height;
+                        break;
+                    }
+                }
+                for(int i = realY - r.height; i < realY ; i++){
+                    if(roi.contains(realX, i)){
+                        startW[0] = realX;
+                        startW[1] = i;
+                        break;
+                    }
+                }
+                for(int i = realY - r.height; i < realY ; i++){
+                    if(roi.contains(realX + r.width, i)){
+                        endW[0] = realX + r.width;
+                        endW[1] = i;
+                        break;
+                    }
+                }
+
+                s1 = (0.5) * ((startW[0] - endW[0]) * (startH[1] - endW[1]) - (startW[1] - endW[1]) * (startH[0] - endW[0]));
+                s2 = (0.5) * ((startW[0] - endW[0]) * (endW[1] - endH[1]) - (startW[1] - endW[1]) * (endW[0] - endH[0]));
+
+                //IS[0] = (int)(startH[0] + (s1 * (endH[0] - startH[0]))/(s1 + s2));
+                //IS[1] = (int)(startH[1] + (s1 * (endH[1] - startH[1]))/(s1 + s2));
+                IS[0] = bbCenterX;
+                IS[1] = bbCenterY;
+                return IS;
+
             }
         }
 

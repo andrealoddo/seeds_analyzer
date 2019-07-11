@@ -31,6 +31,9 @@ import ij.plugin.PlugIn;
 import ij.text.*;
 import ij.measure.ResultsTable;
 
+import java.lang.*;
+
+
 /*
 * Seeds_Analysis e' una classe volta alla misurazione di elementi all'interno di una immagine (binaria+grey+RGB).
 * Si appoggia al Plugin "ThresholdAdjuster" per poter individuare le zone e gli oggetti da analizzare.
@@ -48,6 +51,7 @@ public class Seeds_Analysis implements PlugInFilter {
     protected String imLightBackgroundPath, imDarkBackgroundPath, imPath;
     protected String[] DisplayOption = {"Single Input Image", "Double Input Image"};
     protected ImageCalculator ic;
+
 
 
     public int setup(String arg, ImagePlus imp) {
@@ -194,7 +198,7 @@ public class Seeds_Analysis implements PlugInFilter {
       private boolean[] measureImageJ = new boolean[5];
 
       /* Feature morfologiche implementate ex novo da Marta */
-      private boolean[] measuresBW = new boolean[31];
+      private boolean[] measuresBW = new boolean[30];
       /*CheckBox Misure aggiunte B&W*/
       private boolean doConvexArea, doConvexPerimeter, doArEquivD,
       doAspRatio, doPerEquivD, doMINRMAXR,
@@ -207,7 +211,7 @@ public class Seeds_Analysis implements PlugInFilter {
 
       doIS, doDS,
       doJaggedness, doEndocarp, doBreadth,
-      doMeanRadius, doVarianceR, doCircularity, doCentroid;
+      doAvgRadius, doVarianceR, doCircularity; //doCentroid;
 
       /* Feature texturali implementate ex novo da Marta */
       private boolean[] measuresGrey = new boolean[13];
@@ -260,9 +264,9 @@ public class Seeds_Analysis implements PlugInFilter {
         Font fontSpace = new Font("font", Font.PLAIN, 8);
 
         gd.addMessage("Select the measures for B&W", font, Color.black);
-        String[] labels = new String[5];
-        boolean[] states = new boolean[5];
-        gd.addCheckbox("Select All", false);
+        String[] labels = new String[4];
+        boolean[] states = new boolean[4];
+        gd.addCheckbox("Select All", true);
         labels[0] = "Area                  ";
         states[0] = false;
         //labels[1] = "Centroid              ";
@@ -271,12 +275,12 @@ public class Seeds_Analysis implements PlugInFilter {
         //states[2] = false;
         labels[1] = "Perimeter             ";
         states[1] = false;
-        labels[2] = "Bounding rectangle    ";
+        labels[2] = "Feret's diameter    ";
         states[2] = false;
         labels[3] = "Fit ellipse           ";
         states[3] = false;
-        labels[4] = "Feret's diameter      ";
-        states[4] = false;
+        //labels[4] = "Bounding rectangle      ";
+        //states[4] = false;
         //labels[7] = "Shape descriptors     ";
         //states[7] = false;
 
@@ -346,22 +350,22 @@ public class Seeds_Analysis implements PlugInFilter {
         gd.addCheckboxGroup(3, 4, labels2, states2);
         gd.addMessage(" ", fontSpace, Color.black);
 
-        String[] labels5 = new String[7];
-        boolean[] states5 = new boolean[7];
+        String[] labels5 = new String[6];
+        boolean[] states5 = new boolean[6];
         labels5[0] = "Jaggedness**       ";
         states5[0] = false;
         labels5[1] = "Endocarp**              ";
         states5[1] = false;
         labels5[2] = "Breadth**               ";
         states5[2] = false;
-        labels5[3] = "MeanRadius**            ";
+        labels5[3] = "AvgRadius**            ";
         states5[3] = false;
         labels5[4] = "VarianceRadius**        ";
         states5[4] = false;
         labels5[5] = "Circularity**           ";
         states5[5] = false;
-        labels5[6] = "Centroid**           ";
-        states5[6] = false;
+        //labels5[6] = "Centroid**           ";
+        //states5[6] = false;
 
         gd.setInsets(0, 0, 0);
         gd.addCheckboxGroup(2, 4, labels5, states5);
@@ -372,7 +376,7 @@ public class Seeds_Analysis implements PlugInFilter {
         if(typeRGB){
           String[] labels3 = new String[12];
           boolean[] states3 = new boolean[12];
-          gd.addCheckbox("Select All", false);
+          gd.addCheckbox("Select All", true);
           labels3[0] = "Mean                      ";
           states3[0] = false;
           labels3[1] = "Skewness                  ";
@@ -403,7 +407,7 @@ public class Seeds_Analysis implements PlugInFilter {
         {
           String[] labels3 = new String[13];
           boolean[] states3 = new boolean[13];
-          gd.addCheckbox("Select All", false);
+          gd.addCheckbox("Select All", true);
           labels3[0] = "Mean                      ";
           states3[0] = false;
           labels3[1] = "Skewness                  ";
@@ -433,11 +437,11 @@ public class Seeds_Analysis implements PlugInFilter {
           gd.setInsets(0, 0, 0);
           gd.addCheckboxGroup(4, 4, labels3, states3);
 
-          gd.addMessage("Select the GLCM measures", font, Color.GRAY);
+          //gd.addMessage("Select the GLCM measures", font, Color.GRAY);
 
           String[] labels6 = new String[11];
           boolean[] states6 = new boolean[11];
-          gd.addCheckbox("Select All", false);
+          //gd.addCheckbox("Select All", false);
           labels6[0] = "ASM                      ";
           states6[0] = false;
           labels6[1] = "Contrast                 ";
@@ -460,14 +464,14 @@ public class Seeds_Analysis implements PlugInFilter {
           states6[9] = false;
           labels6[10] = "Shade                   ";
           states6[10] = false;
-          gd.setInsets(0, 0, 0);
-          gd.addCheckboxGroup(3, 4, labels6, states6);
+          //gd.setInsets(0, 0, 0);
+          //gd.addCheckboxGroup(3, 4, labels6, states6);
         }
 
         if(typeRGB){
           gd.addMessage("Select the measures for RGB", font, Color.red);
           // gd.addMessage("Select the measures", font, colors[0]+ "for RGB implemented", font, colors[1]);
-          gd.addCheckbox("Select All", false);
+          gd.addCheckbox("Select All", true);
           String[] labels4 = new String[16];
           boolean[] states4 = new boolean[16];
           labels4[0] = "R mean*                      ";
@@ -513,6 +517,7 @@ public class Seeds_Analysis implements PlugInFilter {
 
         boolean spam = false;
 
+        /*
         // ImageJ + BW
         if (gd.getNextBoolean()) {
           for (int i = 0; i < measureImageJ.length; i++) {
@@ -555,76 +560,67 @@ public class Seeds_Analysis implements PlugInFilter {
             measuresGLCM[i] = gd.getNextBoolean();
           }
         }
+        */
 
-        /*
         //imageJ
         if (gd.getNextBoolean()) {
-          for (int i = 0; i < measureImageJ.length; i++) {
-            measureImageJ[i] = true;
-            spam = gd.getNextBoolean();
-          }
-          for (int i = 0; i < measuresBW.length; i++) {
-            measuresBW[i] = true;
-            spam = gd.getNextBoolean();
-          }
+            for (int i = 0; i < measureImageJ.length; i++) {
+                measureImageJ[i] = true;
+                spam = gd.getNextBoolean();
+            }
+            for (int i = 0; i < measuresBW.length; i++) {
+                measuresBW[i] = true;
+                spam = gd.getNextBoolean();
+            }
         } else {
-          for (int i = 0; i < measureImageJ.length; i++) {
-            measureImageJ[i] = gd.getNextBoolean();
-          }
-          for (int i = 0; i < measuresBW.length; i++) {
-            measuresBW[i] = gd.getNextBoolean();
-          }
+            for (int i = 0; i < measureImageJ.length; i++) {
+                measureImageJ[i] = gd.getNextBoolean();
+            }
+            for (int i = 0; i < measuresBW.length; i++) {
+                measuresBW[i] = gd.getNextBoolean();
+            }
         }
 
         //grey
         if (gd.getNextBoolean()) {
-          if (typeRGB) {
-            for (int i = 0; i < measuresGrey.length - 1; i++) {
-              measuresGrey[i] = true;
-              spam = gd.getNextBoolean();
+            if (typeRGB) {
+                for (int i = 0; i < measuresGrey.length - 1; i++) {
+                    measuresGrey[i] = true;
+                    spam = gd.getNextBoolean();
+                }
+            } else {
+                for (int i = 0; i < measuresGrey.length; i++) {
+                    measuresGrey[i] = true;
+                    //spam = gd.getNextBoolean();
+                }
             }
-          } else {
-            for(int i = 0; i < measuresGrey.length - 1; i++) {
-              measuresGrey[i] = true;
-              spam = gd.getNextBoolean();
-            }
-            if(gd.getNextBoolean()) {
-              for (int i = 0; i < measuresGLCM.length; i++) {
-                measuresGLCM[i] = true;
-              }
-            }
-          }
         }else{
-          if(typeRGB){
-            for (int i = 0; i < measuresGrey.length-1; i++) {
-              measuresGrey[i] = gd.getNextBoolean();
-            }
+            if(typeRGB){
+                for (int i = 0; i < measuresGrey.length-1; i++) {
+                    measuresGrey[i] = gd.getNextBoolean();
+                }
 
-          }else{
-            for (int i = 0; i < measuresGrey.length-1; i++) {
-              measuresGrey[i] = gd.getNextBoolean();
+            }else{
+                for (int i = 0; i < measuresGrey.length-1; i++) {
+                    measuresGrey[i] = gd.getNextBoolean();
+                }
             }
-            for (int i = 0; i < measuresGLCM.length-1; i++) {
-              measuresGLCM[i] = gd.getNextBoolean();
-            }
-          }
         }
 
         if(typeRGB){
-          if(gd.getNextBoolean()){
-            for (int i = 0; i < measureRGB.length; i++) {
-              measureRGB[i] = true;
-              spam = gd.getNextBoolean();
+            if(gd.getNextBoolean()){
+                for (int i = 0; i < measureRGB.length; i++) {
+                    measureRGB[i] = true;
+                    spam = gd.getNextBoolean();
+                }
+            } else {
+                for (int i = 0; i < measureRGB.length; i++) {
+                    measureRGB[i] = gd.getNextBoolean();
+                }
             }
-          } else {
-            for (int i = 0; i < measureRGB.length; i++) {
-              measureRGB[i] = gd.getNextBoolean();
-            }
-          }
         }
-        */
         return true;
-      }
+        }
 
       /**/
       private void setMeasurementsExtended() {
@@ -637,15 +633,15 @@ public class Seeds_Analysis implements PlugInFilter {
           measure += PERIMETER;
         }
         if (measureImageJ[2]) {
-          measure += RECT;
+          measure += FERET;
         }
         if (measureImageJ[3]) {
           measure += ELLIPSE;
         }
-        if (measureImageJ[4]) {
-          measure += FERET;
+        /*if (measureImageJ[4]) {
+          measure += RECT;
         }
-        /*
+
         if (measureImageJ[1]) {
           measure += CENTROID;
         }
@@ -687,10 +683,10 @@ public class Seeds_Analysis implements PlugInFilter {
       doJaggedness = measuresBW[24];
       doEndocarp = measuresBW[25];
       doBreadth = measuresBW[26];
-      doMeanRadius = measuresBW[27];
+      doAvgRadius = measuresBW[27];
       doVarianceR = measuresBW[28];
       doCircularity = measuresBW[29];
-      doCentroid = measuresBW[30];
+      //doCentroid = measuresBW[30];
 
       // Grey
       doMean = measuresGrey[0];
@@ -708,6 +704,7 @@ public class Seeds_Analysis implements PlugInFilter {
       if(!typeRGB) doMinandMax= measuresGrey[12]; if(doMinandMax) { measure += MIN_MAX;}
 
       // Grey - GLCM
+      /*
       doASM = measuresGLCM[0];
       doContrast = measuresGLCM[1];
       doCorrelation = measuresGLCM[2];
@@ -719,6 +716,7 @@ public class Seeds_Analysis implements PlugInFilter {
       doProminence = measuresGLCM[8];
       doVarianceN = measuresGLCM[9];
       doShade = measuresGLCM[10];
+      */
 
       // RGB
       doMeanRed = measureRGB[0];
@@ -752,8 +750,9 @@ public class Seeds_Analysis implements PlugInFilter {
       double[] feret = roi.getFeretValues(); //0 --> feret , 1 --> angle, 2 --> feret min
       double perim = roi.getLength();
       int[] hist = stats.histogram;
-      double[] radiiValues = getRadiiValues(roi, stats.xCenterOfMass, stats.yCenterOfMass);
       double[] centroid = getCentroid(roi); // normalized to width and length of image
+      //double[] radiiValues = getRadiiValues(roi, stats.xCenterOfMass, stats.yCenterOfMass);
+      double[] radiiValues = getRadiiValues(roi, centroid[0], centroid[1]);
 
       if (doConvexArea) { //Area of the convex hull polygon
         rt.addValue("*ConvexArea", convexArea);
@@ -808,11 +807,11 @@ public class Seeds_Analysis implements PlugInFilter {
       if (doRectang) //Rectangularity = Area/ArBBox also called Extent
       rt.addValue("*Rectang", stats.area / (feret[0] * feret[2]));
 
-      if (doModRatio) //Modification ratio = (2�MinR)/Feret
-      rt.addValue("*ModRatio", (feret[2] / feret[0])); //2 * MinR / Feret DA RIVEDERE dannorisultati uguali
+      if (doModRatio) //Modification ratio = (2*MinR)/Feret
+      rt.addValue("*ModRatio", (feret[2] / feret[0])); //2 * MinR / Feret DA RIVEDERE danno risultati uguali
 
       if (doSphericity) //Sphericity = MinR/MaxR also called Radius ratio
-      rt.addValue("*Sphericity", (feret[2] / 2) / (feret[0] / 2)); //MinR / MaxR DA RIVEDERE danno risultati ugualu
+      rt.addValue("*Sphericity", (feret[2] / 2) / (feret[0] / 2)); //MinR / MaxR DA RIVEDERE danno risultati uguali
 
       if (doElongation) //The inverse of the circularity,  Perim2/(4�?�Area)
       rt.addValue("*Elongation", (perim * perim) / (4 * pigreco * stats.area));
@@ -821,7 +820,7 @@ public class Seeds_Analysis implements PlugInFilter {
       rt.addValue("*normPeriIndex", (2 * Math.sqrt(pigreco * stats.area)) / perim);
 
       if (doHaralickRatio) {
-        double haralickRatio = getHaralickRatio(polygon);
+        double haralickRatio = getHaralickRatio(radiiValues[2], radiiValues[4]);
         rt.addValue("*HaralickRatio", haralickRatio);
       }
       if (doBendingEnergy) {
@@ -829,13 +828,15 @@ public class Seeds_Analysis implements PlugInFilter {
         rt.addValue("*Bending Energy", be);
       }
       if (doIS) {
-        int[] intersectionIS = getIS(roi);
+        double[] intersectionIS = getIS(roi);
         rt.addValue("IS: x", intersectionIS[0]);
         rt.addValue("IS: y", intersectionIS[1]);
       }
       if (doDS) {
-        int[] intersectionIS = getIS(roi);
-        rt.addValue("DS",getDS(roi, intersectionIS, stats.xCenterOfMass, stats.yCenterOfMass));
+        double[] intersectionIS = getIS(roi);
+        double[] cent = getCentroid(roi);
+        //rt.addValue("DS",getDS(roi, intersectionIS, stats.xCenterOfMass, stats.yCenterOfMass));
+        rt.addValue("DS",getDS(roi, intersectionIS, cent[0], cent[1]));
       }
       if (doJaggedness) {
         rt.addValue("*Jaggedness", (2*Math.sqrt(Math.PI*stats.area))/perim);
@@ -846,8 +847,8 @@ public class Seeds_Analysis implements PlugInFilter {
       if (doBreadth) {
         rt.addValue("*Breadth", feret[2]);
       }
-      if (doMeanRadius) {
-        rt.addValue("*MeanR", radiiValues[2]);
+      if (doAvgRadius) {
+        rt.addValue("*avgR", radiiValues[2]);
       }
       if (doVarianceR) {
         rt.addValue("*VarianceR", radiiValues[3]);
@@ -855,10 +856,12 @@ public class Seeds_Analysis implements PlugInFilter {
       if (doCircularity) {  // 4pi*area/perimeter^2
         rt.addValue("*Circularity", (4*Math.PI*stats.area)/Math.pow(perim,2));
       }
+      /*
       if (doCentroid) {  // Based on bounding rectangle
         rt.addValue("*Centroid: x", centroid[0]);
         rt.addValue("*Centroid: y", centroid[1]);
       }
+      */
 
       /*Grey*/
       if (doVariance) {
@@ -1078,11 +1081,18 @@ public class Seeds_Analysis implements PlugInFilter {
       return bendingEnergy * Math.pow(k.length, -1);
     }
 
+    private double getHaralickRatio(double avg, double stdDev) {
+
+
+      return avg/stdDev;
+    }
+
+
     /*Riguardante il calcolo del Haralick Ratio
     * Sfruttando la trasformazione in convexHull del roi, si prendono i punti delle coordinate x e y e si lavorano su essi:
     * ovunque la y abbia un valore uguale si considera la x
     * purtroppo essi sono disordinati*/
-    private double getHaralickRatio(Polygon p) {
+    private double getHaralickRatioOld(Polygon p) {
       /*Essendo disordinati bisogna scorrere gli array delle x e delle y*/
       double sumMean = 0.0;
       /*raccoglier� tutti i raggi*/
@@ -1227,8 +1237,8 @@ public class Seeds_Analysis implements PlugInFilter {
       double[] centroid = new double[2]; // x, y
 
       // Metodo 3
-      centroid[0] = roi.getStatistics().xCentroid - roi.getStatistics().roiX;
-      centroid[1] = roi.getStatistics().yCentroid - roi.getStatistics().roiY;
+      centroid[0] = roi.getStatistics().xCentroid;// - roi.getStatistics().roiX;
+      centroid[1] = roi.getStatistics().yCentroid;// - roi.getStatistics().roiY;
 
       return centroid;
     }
@@ -1247,13 +1257,13 @@ public class Seeds_Analysis implements PlugInFilter {
       radiiValues[1] = -1; //max
 
       for(i = 0; i < n; i++){
-        radii[i] = distance((int)x_cg, (int)y_cg, p.xpoints[i],impHeight -p.ypoints[i]);
+        radii[i] = distance((int)x_cg, (int)y_cg, p.xpoints[i], p.ypoints[i]);
 
         if(radii[i] < radiiValues[0])
-        radiiValues[0] = radii[i];
+          radiiValues[0] = radii[i];
         if(radii[i] > radiiValues[1])
-        radiiValues[1] = radii[i];
-        sumR+= radii[i];
+          radiiValues[1] = radii[i];
+        sumR += radii[i];
       }
 
       double media = sumR/n;
@@ -1268,7 +1278,7 @@ public class Seeds_Analysis implements PlugInFilter {
       return  radiiValues;
     }
 
-    private double getDS(Roi roi, int[] is, double x_cg, double y_cg){
+    private double getDS(Roi roi, double[] is, double x_cg, double y_cg){
       //double ds = Math.sqrt(Math.pow((is[0] - x_cg), 2.0) + Math.pow((is[1] - y_cg), 2.0));
       Point2D.Double pIs = new Point2D.Double(is[0], is[1]);
       Point2D.Double pCg = new Point2D.Double(x_cg, y_cg);
@@ -1276,12 +1286,16 @@ public class Seeds_Analysis implements PlugInFilter {
       return ds;
     }
 
-    private int[] getIS(Roi roi) {
+    private double[] getIS(Roi roi) {
       int impHeight = imp.getHeight();
       int impWidth = imp.getWidth();
       Rectangle r = roi.getBounds();
-      int bbCenterX = r.x + r.width/2;
-      int bbCenterY = impHeight - r.y - r.height/2;
+      //int bbCenterX = r.x + r.width/2;
+      //int bbCenterY = impHeight - r.y - r.height/2;
+      double[] bbCenter = getCentroid(roi);
+      double bbCenterX = bbCenter[0];
+      double bbCenterY = bbCenter[1];
+      double[] feretValues = roi.getFeretValues();
       int realX = r.x;
       int realY = impHeight - r.y;
 
@@ -1289,9 +1303,19 @@ public class Seeds_Analysis implements PlugInFilter {
       int[] endH = new int[2];
       int[] startW = new int[2];
       int[] endW = new int[2];
-      double s1, s2;
-      int[] IS = new int[2];
+      startH[0] = (int) feretValues[8]; // FeretX startpoint
+      startH[1] = (int) feretValues[9]; // FeretY startpoint
+      endH[0] = (int) feretValues[10];  // FeretX endpoint
+      endH[1] = (int) feretValues[11];  // FeretY endpoint
+      startW[0] = (int) feretValues[12]; // minFeretX startpoint
+      startW[1] = (int) feretValues[13]; // minFeretY startpoint
+      endW[0] = (int) feretValues[14];  // minFeretX endpoint
+      endW[1] = (int) feretValues[15]; // minFeretY endpoint
 
+      double s1, s2;
+      double[] IS = new double[2];
+
+/*
       for(int i = realX; i < realX + r.width; i++) {
         if (roi.contains(i, realY)) {
           startH[0] = i;
@@ -1299,6 +1323,7 @@ public class Seeds_Analysis implements PlugInFilter {
           break;
         }
       }
+
       for(int i = realX; i < realX + r.width; i++){
         if(roi.contains(i, realY - r.height)){
           endH[0] = i;
@@ -1320,14 +1345,13 @@ public class Seeds_Analysis implements PlugInFilter {
           break;
         }
       }
-
+*/
       s1 = (0.5) * ((startW[0] - endW[0]) * (startH[1] - endW[1]) - (startW[1] - endW[1]) * (startH[0] - endW[0]));
       s2 = (0.5) * ((startW[0] - endW[0]) * (endW[1] - endH[1]) - (startW[1] - endW[1]) * (endW[0] - endH[0]));
 
-      //IS[0] = (int)(startH[0] + (s1 * (endH[0] - startH[0]))/(s1 + s2));
-      //IS[1] = (int)(startH[1] + (s1 * (endH[1] - startH[1]))/(s1 + s2));
-      IS[0] = bbCenterX;
-      IS[1] = bbCenterY;
+      IS[0] = (int)(startH[0] + (s1 * (endH[0] - startH[0]))/(s1 + s2));
+      IS[1] = (int)(startH[1] + (s1 * (endH[1] - startH[1]))/(s1 + s2));
+
       return IS;
     }
   }

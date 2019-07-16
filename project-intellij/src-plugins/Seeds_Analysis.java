@@ -65,19 +65,17 @@ public class Seeds_Analysis implements PlugIn
         imp = IJ.getImage();
         if (imp.getType() == ImagePlus.COLOR_RGB)
         {
-            typeRGB = true;
-        }
-        if(typeRGB)
-        {
             ChannelSplitter ch = new ChannelSplitter();
             impPlusesRGB = ch.split(imp);
             impPlusesHSB = getImagePlusHSB(imp);
+
+            typeRGB = true;
         }
 
         cells_analyzer = new Cells_Analyzer();
         flags = cells_analyzer.setup("", imp);
 
-        /*Controllo*/
+        /* Controllo */
         if (flags == PlugInFilter.DONE)
         {
             return;
@@ -351,9 +349,9 @@ public class Seeds_Analysis implements PlugIn
                 states3[10] = false;
                 labels3[11] = "Smoothness R*            ";
                 states3[11] = false;
-                labels3[12] = "Min and Max              ";
+                labels3[12] = "Temp GLCM                ";
                 states3[12] = false;
-                labels3[13] = "Temp GLCM                ";
+                labels3[13] = "Min and Max              ";
                 states3[13] = false;
 
                 gd.setInsets(0, 0, 0);
@@ -437,7 +435,7 @@ public class Seeds_Analysis implements PlugIn
             //grey
             if(gd.getNextBoolean())
             {
-                if (typeRGB)
+                if(typeRGB)
                 {
                     for (int i = 0; i < measuresGrey.length - 1; i++)
                     {
@@ -545,8 +543,8 @@ public class Seeds_Analysis implements PlugIn
             doVariance = measuresGrey[9];
             doMedian = measuresGrey[10]; if (doMedian) { measure += MEDIAN; }
             doSmothness = measuresGrey[11];
-            if(!typeRGB) doMinandMax= measuresGrey[12]; if(doMinandMax) { measure += MIN_MAX;}
-            doGLCM = measuresGrey[13];
+            doGLCM = measuresGrey[12];
+            if(!typeRGB) doMinandMax= measuresGrey[13]; if(doMinandMax) { measure += MIN_MAX;}
 
             // RGB
             doMeanRed = measureRGB[0];
@@ -583,12 +581,6 @@ public class Seeds_Analysis implements PlugIn
             double convexArea = getArea(polygon);
             double convexPerimeter = getPerimeter(polygon);
             int[] hist = stats.histogram;
-
-            // test
-            if(doGLCM)
-            {
-                //GLCM_TextureToo glcm = new GLCM_TextureToo();
-            }
 
             if(doArea)
             {
@@ -731,13 +723,13 @@ public class Seeds_Analysis implements PlugIn
                 rt.addValue("*HaralickRatio", haralickRatio);
             }
 
-            if (doBendingEnergy)
+            if(doBendingEnergy)
             {
                 double be = getBendingEnergy(polygon);
                 rt.addValue("*Bending Energy", be);
             }
 
-            if (doDS)
+            if(doDS)
             {
                 double[] intersectionIS = getIS(roi);
                 double[] cent = getCentroid(roi);
@@ -822,13 +814,38 @@ public class Seeds_Analysis implements PlugIn
             if(doSmothness)
             {
                 rt.addValue("**Smothness R", getSmoothness(Math.pow(stats.stdDev, 2)));
+                IJ.log("Smothness true");
             }
 
+            // test
             if(doGLCM)
             {
-                rt.addValue("test", 0);
-            }
 
+              GLCM_TextureToo glcm = new GLCM_TextureToo();
+              flags = glcm.setup("", imp);
+
+              if (flags == PlugInFilter.DONE)
+              {
+                  return;
+              }
+              glcm.run(imp.getProcessor());
+              rt.addValue("GLCM", glcm.getResults());
+
+                //rt.addValue("test", 0);
+                //IJ.log("doGLCM true");
+
+                /**** TEST ****
+                GLCM_TextureToo glcm = new GLCM_TextureToo();
+                flags = glcm.setup("", imp);
+
+                if (flags == PlugInFilter.DONE)
+                {
+                    return;
+                }
+                glcm.run(imp.getProcessor());
+                //glcm.getResultsTable().show("Results");
+                */
+            }
 
             if(typeRGB)
             {
@@ -1161,39 +1178,39 @@ public class Seeds_Analysis implements PlugIn
 
         private double[] getIS(Roi roi)
         {
-            int impHeight = imp.getHeight();
-            int impWidth = imp.getWidth();
-            Rectangle r = roi.getBounds();
-            //int bbCenterX = r.x + r.width/2;
-            //int bbCenterY = impHeight - r.y - r.height/2;
-            double[] bbCenter = getCentroid(roi);
-            double bbCenterX = bbCenter[0];
-            double bbCenterY = bbCenter[1];
-            double[] feretValues = roi.getFeretValues();
-            int realX = r.x;
-            int realY = impHeight - r.y;
-
             int[] startH = new int[2];
             int[] endH = new int[2];
             int[] startW = new int[2];
             int[] endW = new int[2];
-            startH[0] = (int) feretValues[8]; // FeretX startpoint
-            startH[1] = (int) feretValues[9]; // FeretY startpoint
-            endH[0] = (int) feretValues[10];  // FeretX endpoint
-            endH[1] = (int) feretValues[11];  // FeretY endpoint
-            startW[0] = (int) feretValues[12]; // minFeretX startpoint
-            startW[1] = (int) feretValues[13]; // minFeretY startpoint
-            endW[0] = (int) feretValues[14];  // minFeretX endpoint
-            endW[1] = (int) feretValues[15]; // minFeretY endpoint
-
-            double s1, s2;
+            double[] feretValues = roi.getFeretValues();
             double[] IS = new double[2];
+            double s1, s2;
 
-            s1 = (0.5) * ((startW[0] - endW[0]) * (startH[1] - endW[1]) - (startW[1] - endW[1]) * (startH[0] - endW[0]));
-            s2 = (0.5) * ((startW[0] - endW[0]) * (endW[1] - endH[1]) - (startW[1] - endW[1]) * (endW[0] - endH[0]));
+            IS[0] = 0.0;
+            IS[1] = 0.0;
 
-            IS[0] = (int)(startH[0] + (s1 * (endH[0] - startH[0]))/(s1 + s2));
-            IS[1] = (int)(startH[1] + (s1 * (endH[1] - startH[1]))/(s1 + s2));
+            try
+            {
+              startH[0] = (int) feretValues[8]; // FeretX startpoint
+              startH[1] = (int) feretValues[9]; // FeretY startpoint
+              endH[0] = (int) feretValues[10];  // FeretX endpoint
+              endH[1] = (int) feretValues[11];  // FeretY endpoint
+              startW[0] = (int) feretValues[12]; // minFeretX startpoint
+              startW[1] = (int) feretValues[13]; // minFeretY startpoint
+              endW[0] = (int) feretValues[14];  // minFeretX endpoint
+              endW[1] = (int) feretValues[15]; // minFeretY endpoint
+
+              s1 = (0.5) * ((startW[0] - endW[0]) * (startH[1] - endW[1]) - (startW[1] - endW[1]) * (startH[0] - endW[0]));
+              s2 = (0.5) * ((startW[0] - endW[0]) * (endW[1] - endH[1]) - (startW[1] - endW[1]) * (endW[0] - endH[0]));
+
+              IS[0] = (int)(startH[0] + (s1 * (endH[0] - startH[0]))/(s1 + s2));
+              IS[1] = (int)(startH[1] + (s1 * (endH[1] - startH[1]))/(s1 + s2));
+
+            }
+            catch(ArrayIndexOutOfBoundsException e)
+            {
+              IJ.log("Errore sul recupero dei valori di Feret");
+            }
 
             return IS;
         }
@@ -1201,7 +1218,7 @@ public class Seeds_Analysis implements PlugIn
 
     //==========================================================
     class GLCM_TextureToo implements PlugInFilter {
-        int d = 1;
+      int d = 1;
     	int phi = 0;
     	boolean symmetry = true;
     	boolean doASM = true;
@@ -1215,17 +1232,29 @@ public class Seeds_Analysis implements PlugIn
     	boolean doProminence = true;
     	boolean doVariance = true;
     	boolean doShade = true;
+      protected int test = 0;
 
     	ResultsTable rt = ResultsTable.getResultsTable();
+
+      public int getResults()
+      {
+        return test;
+      }
 
     	public int setup(String arg, ImagePlus imp) {
     		if (imp!=null && !showDialog()) return DONE;
     		//perhaps not reseting the resultsTable would be better... ??
-    		rt.reset();
+    		//rt.reset();
+        IJ.log("Inside Setup");
     		return DOES_8G+DOES_STACKS+SUPPORTS_MASKING;
     	}
 
-    public void run(ImageProcessor ip) {
+      public void run(ImageProcessor ip)
+      {
+        test = 24;
+      }
+
+    public void Oldrun(ImageProcessor ip) {
 
     	// use the bounding rectangle ROI to roughly limit processing
     		Rectangle roi = ip.getRoi();
@@ -1596,7 +1625,7 @@ public class Seeds_Analysis implements PlugIn
     //=========================================================================================
     	// implementation of the dialog
     	boolean showDialog() {
-      	GenericDialog gd = new GenericDialog("GLCM Texture v0.001");
+        GenericDialog gd = new GenericDialog("GLCM Texture v0.001");
     		gd.addNumericField ("Enter the size of the step in pixels",  d, 0);
 
     		String [] angles={"0", "45", "90", "135"};

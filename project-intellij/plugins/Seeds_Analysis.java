@@ -40,7 +40,7 @@ import java.lang.*;
 * Implementa Plugin ma al suo interno vi e' una classe Cells_Analyzer che estende a sua volta il PlugInFilter "ParticleAnalyzer"
 * aggiungendo misure non presenti in quest'ultimo.*/
 
-public class Seeds_Analysis implements PlugInFilter {
+public class Seeds_Analysis implements PlugIn {
     protected ImagePlus impPlusesRGB [];
     protected ImagePlus impPlusesHSB [];
     protected ImagePlus imp;
@@ -52,27 +52,32 @@ public class Seeds_Analysis implements PlugInFilter {
     protected String[] DisplayOption = {"Single Input Image", "Double Input Image"};
     protected ImageCalculator ic;
 
+    public void run(String arg) {
+        imp = IJ.getImage();
+        if (imp.getType() == ImagePlus.COLOR_RGB) typeRGB = true;
+        if(typeRGB){
+            ChannelSplitter ch = new ChannelSplitter();
+            impPlusesRGB = ch.split(imp);
+            impPlusesHSB = getImagePlusHSB(imp);
 
+        }
+        Cells_Analyzer cells_analyzer = new Cells_Analyzer();
 
-    public int setup(String arg, ImagePlus imp) {
-      //if (imp != null) return DONE;
-      //perhaps not reseting the resultsTable would be better... ??
-      //rt.reset();
-      //return DOES_8G+DOES_STACKS+SUPPORTS_MASKING;
-      return 1;
+        int flags = cells_analyzer.setup("", imp);
+
+        /*Controllo*/
+        if (flags == PlugInFilter.DONE)
+            return;
+        cells_analyzer.run(imp.getProcessor());
+        /*visualizzazione dei risultati*/
+        Analyzer.getResultsTable().show("Results");
+
     }
-
-/*
-    public void run(ImageProcessor ip)
-    {
-
-    }
-*/
 
     /* Metodo run necessaria per i PlugIn
     * Memorizza l'immagine in ingresso
     * richiama il metodo catch_parasite_running dandogli in ingresso l'immagine */
-    public void run(ImageProcessor ip) {
+    public void run_new(String arg) {
 
       /* STEP 1: Check if the user want to merge two images! */
 
@@ -125,7 +130,7 @@ public class Seeds_Analysis implements PlugInFilter {
         impPlusesHSB = getImagePlusHSB(imp);
       }
 
-      Cells_Analyzer cells_analyzer = new Cells_Analyzer(ip.getRoi(), ip.getWidth(), ip.getHeight(), (byte []) ip.getPixels(), ip.getMaskArray());
+      Cells_Analyzer cells_analyzer = new Cells_Analyzer();
 
       int flags = cells_analyzer.setup("", imp);
 
@@ -177,30 +182,15 @@ public class Seeds_Analysis implements PlugInFilter {
     * Al suo interno, attraverso gli Override, si estendono i metodi gia' presenti nella classe ParticleAnalyzer*/
     class Cells_Analyzer extends ParticleAnalyzer {
 
-      Rectangle r;
-      int width;
-      int height;
-      byte[] pixels;
-      byte[] mask;
-
-      public Cells_Analyzer(Rectangle r, int w, int h, byte[] pixels, byte[] mask)
-      {
-        r = r;
-        width = w;
-        height = h;
-        pixels = pixels;
-        mask = mask;
-      }
-
       int measure = 0;
 
       /* Feature di default ImageJ */
-      private boolean[] measureImageJ = new boolean[5];
+      private boolean[] measureImageJ = new boolean[3];
 
       /* Feature morfologiche implementate ex novo da Marta */
-      private boolean[] measuresBW = new boolean[30];
+      private boolean[] measuresBW = new boolean[29];
       /*CheckBox Misure aggiunte B&W*/
-      private boolean doConvexArea, doConvexPerimeter, doArEquivD,
+      private boolean doArea, doPerimeter, doFeret, doConvexArea, doConvexPerimeter, doArEquivD,
       doAspRatio, doPerEquivD, doMINRMAXR,
       doRoundness, doEquivEllAr, doCompactness,
       doSolidity, doShape, doRFactor,
@@ -208,25 +198,25 @@ public class Seeds_Analysis implements PlugInFilter {
       doRectang, doModRatio, doSphericity,
       doElongation, doNormPeriIndex, doHaralickRatio,
       doBendingEnergy,
-
-      doIS, doDS,
+      doDS,
       doJaggedness, doEndocarp, doBreadth,
-      doAvgRadius, doVarianceR, doCircularity; //doCentroid;
+      doAvgRadius, doVarianceR, doCircularity;
 
       /* Feature texturali implementate ex novo da Marta */
-      private boolean[] measuresGrey = new boolean[13];
+      private boolean[] measuresGrey = new boolean[14];
       /*CheckBox Misure aggiunte GREY*/
       private boolean doMean, doSkewness, doKurtois,
       doMode, doMedian, doEntropy, doIntensitySum,
       doSquareIntensitySum, doUniformity, doVariance, doStandardDeviation,
-      doSmothness, doMinandMax;
+      doSmothness, doMinandMax, doGLCM;
 
-      /* Feature texturali di Haralick implementate ex novo da Andrea */
+      /* Feature texturali di Haralick implementate ex novo da Andrea
       private boolean[] measuresGLCM = new boolean[11];
-      /*CheckBox Misure aggiunte GREY*/
+      /*CheckBox Misure aggiunte GREY
       private boolean doASM, doContrast, doCorrelation,
       doIDM, doEntropyN, doEnergy, doInertia, doHomogeneity,
       doProminence, doVarianceN, doShade;
+      /*
 
       /* Feature di colore implementate ex novo da Marta */
       private boolean[] measureRGB = new boolean[16];
@@ -264,28 +254,30 @@ public class Seeds_Analysis implements PlugInFilter {
         Font fontSpace = new Font("font", Font.PLAIN, 8);
 
         gd.addMessage("Select the measures for B&W", font, Color.black);
-        String[] labels = new String[4];
-        boolean[] states = new boolean[4];
-        gd.addCheckbox("Select All", true);
+        String[] labels = new String[3];
+        boolean[] states = new boolean[3];
+        gd.addCheckbox("Select All", false);
         labels[0] = "Area                  ";
         states[0] = false;
-        //labels[1] = "Centroid              ";
-        //states[1] = false;
-        //labels[2] = "Center of mass        ";
-        //states[2] = false;
         labels[1] = "Perimeter             ";
         states[1] = false;
         labels[2] = "Feret's diameter    ";
         states[2] = false;
-        labels[3] = "Fit ellipse           ";
-        states[3] = false;
+
+
+        //labels[3] = "Fit ellipse           ";
+        //states[3] = false;
+        //labels[1] = "Centroid              ";
+        //states[1] = false;
+        //labels[2] = "Center of mass        ";
+        //states[2] = false;
         //labels[4] = "Bounding rectangle      ";
         //states[4] = false;
         //labels[7] = "Shape descriptors     ";
         //states[7] = false;
 
         gd.setInsets(1, 0, 0);
-        gd.addCheckboxGroup(2, 4, labels, states);
+        gd.addCheckboxGroup(1, 4, labels, states);
         gd.addMessage(" ", fontSpace, Color.black);
 
         String[] labels1 = new String[12];
@@ -310,17 +302,17 @@ public class Seeds_Analysis implements PlugInFilter {
         states1[8] = false;
         labels1[9] = "Solidity*             ";
         states1[9] = false;
-        labels1[10] = "ThinnessR*               ";
+        labels1[10] = "ThinnessR*           ";
         states1[10] = false;
-        labels1[11] = "RFactor*                ";
+        labels1[11] = "RFactor*             ";
         states1[11] = false;
 
         gd.setInsets(0, 0, 0);
-        gd.addCheckboxGroup(3, 4, labels1, states1);
+        gd.addCheckboxGroup(3, 5, labels1, states1);
         gd.addMessage(" ", fontSpace, Color.black);
 
-        String[] labels2 = new String[12];
-        boolean[] states2 = new boolean[12];
+        String[] labels2 = new String[11];
+        boolean[] states2 = new boolean[11];
         labels2[0] = "Convexity*             ";
         states2[0] = false;
         labels2[1] = "Concavity*              ";
@@ -341,13 +333,11 @@ public class Seeds_Analysis implements PlugInFilter {
         states2[8] = false;
         labels2[9] = "Bending Energy*        ";
         states2[9] = false;
-        labels2[10] = "IS**        ";
+        labels2[10] = "DS**        ";
         states2[10] = false;
-        labels2[11] = "DS**        ";
-        states2[11] = false;
 
         gd.setInsets(0, 0, 0);
-        gd.addCheckboxGroup(3, 4, labels2, states2);
+        gd.addCheckboxGroup(3, 5, labels2, states2);
         gd.addMessage(" ", fontSpace, Color.black);
 
         String[] labels5 = new String[6];
@@ -364,8 +354,6 @@ public class Seeds_Analysis implements PlugInFilter {
         states5[4] = false;
         labels5[5] = "Circularity**           ";
         states5[5] = false;
-        //labels5[6] = "Centroid**           ";
-        //states5[6] = false;
 
         gd.setInsets(0, 0, 0);
         gd.addCheckboxGroup(2, 4, labels5, states5);
@@ -376,7 +364,7 @@ public class Seeds_Analysis implements PlugInFilter {
         if(typeRGB){
           String[] labels3 = new String[12];
           boolean[] states3 = new boolean[12];
-          gd.addCheckbox("Select All", true);
+          gd.addCheckbox("Select All", false);
           labels3[0] = "Mean                      ";
           states3[0] = false;
           labels3[1] = "Skewness                  ";
@@ -405,9 +393,9 @@ public class Seeds_Analysis implements PlugInFilter {
           gd.addCheckboxGroup(3, 4, labels3, states3);
         }else
         {
-          String[] labels3 = new String[13];
-          boolean[] states3 = new boolean[13];
-          gd.addCheckbox("Select All", true);
+          String[] labels3 = new String[14];
+          boolean[] states3 = new boolean[14];
+          gd.addCheckbox("Select All", false);
           labels3[0] = "Mean                      ";
           states3[0] = false;
           labels3[1] = "Skewness                  ";
@@ -434,44 +422,17 @@ public class Seeds_Analysis implements PlugInFilter {
           states3[11] = false;
           labels3[12] = "Min and Max              ";
           states3[12] = false;
+          labels3[13] = "Temp GLCM                ";
+          states3[13] = false;
+
           gd.setInsets(0, 0, 0);
           gd.addCheckboxGroup(4, 4, labels3, states3);
 
-          //gd.addMessage("Select the GLCM measures", font, Color.GRAY);
-
-          String[] labels6 = new String[11];
-          boolean[] states6 = new boolean[11];
-          //gd.addCheckbox("Select All", false);
-          labels6[0] = "ASM                      ";
-          states6[0] = false;
-          labels6[1] = "Contrast                 ";
-          states6[1] = false;
-          labels6[2] = "Correlation              ";
-          states6[2] = false;
-          labels6[3] = "IDM                      ";
-          states6[3] = false;
-          labels6[4] = "Entropy                  ";
-          states6[4] = false;
-          labels6[5] = "Energy                   ";
-          states6[5] = false;
-          labels6[6] = "Inertia                  ";
-          states6[6] = false;
-          labels6[7] = "Homogeneity              ";
-          states6[7] = false;
-          labels6[8] = "Prominence               ";
-          states6[8] = false;
-          labels6[9] = "Variance                 ";
-          states6[9] = false;
-          labels6[10] = "Shade                   ";
-          states6[10] = false;
-          //gd.setInsets(0, 0, 0);
-          //gd.addCheckboxGroup(3, 4, labels6, states6);
         }
 
         if(typeRGB){
           gd.addMessage("Select the measures for RGB", font, Color.red);
-          // gd.addMessage("Select the measures", font, colors[0]+ "for RGB implemented", font, colors[1]);
-          gd.addCheckbox("Select All", true);
+          gd.addCheckbox("Select All", false);
           String[] labels4 = new String[16];
           boolean[] states4 = new boolean[16];
           labels4[0] = "R mean*                      ";
@@ -508,7 +469,7 @@ public class Seeds_Analysis implements PlugInFilter {
           states4[15] = false;
 
           gd.setInsets(0, 0, 0);
-          gd.addCheckboxGroup(6, 3, labels4, states4);
+          gd.addCheckboxGroup(3, 6, labels4, states4);
         }
 
         gd.showDialog(); //show
@@ -516,51 +477,6 @@ public class Seeds_Analysis implements PlugInFilter {
         return false;
 
         boolean spam = false;
-
-        /*
-        // ImageJ + BW
-        if (gd.getNextBoolean()) {
-          for (int i = 0; i < measureImageJ.length; i++) {
-            measureImageJ[i] = true;
-            spam = gd.getNextBoolean();
-          }
-          for (int i = 0; i < measuresBW.length; i++) {
-            measuresBW[i] = true;
-            spam = gd.getNextBoolean();
-          }
-        } else {
-          for (int i = 0; i < measureImageJ.length; i++) {
-            measureImageJ[i] = gd.getNextBoolean();
-          }
-          for (int i = 0; i < measuresBW.length; i++) {
-            measuresBW[i] = gd.getNextBoolean();
-          }
-        }
-
-        // Grey
-        if (gd.getNextBoolean()) {
-          for (int i = 0; i < measuresGrey.length; i++) {
-            measuresGrey[i] = true;
-            spam = gd.getNextBoolean();
-          }
-        } else {
-          for (int i = 0; i < measuresGrey.length; i++) {
-            measuresGrey[i] = gd.getNextBoolean();
-          }
-        }
-
-        // Haralick
-        if (gd.getNextBoolean()) {
-          for (int i = 0; i < measuresGLCM.length; i++) {
-            measuresGLCM[i] = true;
-            spam = gd.getNextBoolean();
-          }
-        } else {
-          for (int i = 0; i < 9; i++) {
-            measuresGLCM[i] = gd.getNextBoolean();
-          }
-        }
-        */
 
         //imageJ
         if (gd.getNextBoolean()) {
@@ -619,29 +535,32 @@ public class Seeds_Analysis implements PlugInFilter {
                 }
             }
         }
+
         return true;
-        }
+    }
 
       /**/
       private void setMeasurementsExtended() {
 
-        /*Misure by ImageJ*/
-        if (measureImageJ[0]) {
-          measure += AREA;
-        }
+        /*Misure by ImageJ
         if (measureImageJ[1]) {
           measure += PERIMETER;
         }
         if (measureImageJ[2]) {
           measure += FERET;
         }
+
+        if (measureImageJ[0]) {
+          measure += AREA;
+        }
+
         if (measureImageJ[3]) {
           measure += ELLIPSE;
         }
-        /*if (measureImageJ[4]) {
+
+        if (measureImageJ[4]) {
           measure += RECT;
         }
-
         if (measureImageJ[1]) {
           measure += CENTROID;
         }
@@ -654,6 +573,10 @@ public class Seeds_Analysis implements PlugInFilter {
       */
 
       // BW
+      doArea = measureImageJ[0];
+      doPerimeter = measureImageJ[1];
+      doFeret = measureImageJ[2];
+
       doConvexArea = measuresBW[0];
       doConvexPerimeter = measuresBW[1];
       doArEquivD = measuresBW[2];
@@ -678,15 +601,13 @@ public class Seeds_Analysis implements PlugInFilter {
       doBendingEnergy = measuresBW[21];
 
       // new features, specific for seeds analysis
-      doIS = measuresBW[22];
-      doDS = measuresBW[23];
-      doJaggedness = measuresBW[24];
-      doEndocarp = measuresBW[25];
-      doBreadth = measuresBW[26];
-      doAvgRadius = measuresBW[27];
-      doVarianceR = measuresBW[28];
-      doCircularity = measuresBW[29];
-      //doCentroid = measuresBW[30];
+      doDS = measuresBW[22];
+      doJaggedness = measuresBW[23];
+      doEndocarp = measuresBW[24];
+      doBreadth = measuresBW[25];
+      doAvgRadius = measuresBW[26];
+      doVarianceR = measuresBW[27];
+      doCircularity = measuresBW[28];
 
       // Grey
       doMean = measuresGrey[0];
@@ -702,21 +623,7 @@ public class Seeds_Analysis implements PlugInFilter {
       doMedian = measuresGrey[10]; if (doMedian) { measure += MEDIAN; }
       doSmothness = measuresGrey[11];
       if(!typeRGB) doMinandMax= measuresGrey[12]; if(doMinandMax) { measure += MIN_MAX;}
-
-      // Grey - GLCM
-      /*
-      doASM = measuresGLCM[0];
-      doContrast = measuresGLCM[1];
-      doCorrelation = measuresGLCM[2];
-      doIDM = measuresGLCM[3];
-      doEntropyN = measuresGLCM[4];
-      doEnergy = measuresGLCM[5];
-      doInertia = measuresGLCM[6];
-      doHomogeneity = measuresGLCM[7];
-      doProminence = measuresGLCM[8];
-      doVarianceN = measuresGLCM[9];
-      doShade = measuresGLCM[10];
-      */
+      doGLCM = measuresGrey[13];
 
       // RGB
       doMeanRed = measureRGB[0];
@@ -751,8 +658,20 @@ public class Seeds_Analysis implements PlugInFilter {
       double perim = roi.getLength();
       int[] hist = stats.histogram;
       double[] centroid = getCentroid(roi); // normalized to width and length of image
-      //double[] radiiValues = getRadiiValues(roi, stats.xCenterOfMass, stats.yCenterOfMass);
       double[] radiiValues = getRadiiValues(roi, centroid[0], centroid[1]);
+
+      if (doArea) {
+        rt.addValue("Area", stats.area);
+      }
+
+      if(doPerimeter) {
+        rt.addValue("Perimeter", perim);
+      }
+
+      if(doFeret) {
+        rt.addValue("MinFeret", feret[2]);
+        rt.addValue("MaxFeret", feret[0]);
+      }
 
       if (doConvexArea) { //Area of the convex hull polygon
         rt.addValue("*ConvexArea", convexArea);
@@ -827,11 +746,13 @@ public class Seeds_Analysis implements PlugInFilter {
         double be = getBendingEnergy(polygon);
         rt.addValue("*Bending Energy", be);
       }
+      /*
       if (doIS) {
         double[] intersectionIS = getIS(roi);
         rt.addValue("IS: x", intersectionIS[0]);
         rt.addValue("IS: y", intersectionIS[1]);
       }
+      */
       if (doDS) {
         double[] intersectionIS = getIS(roi);
         double[] cent = getCentroid(roi);
@@ -856,12 +777,6 @@ public class Seeds_Analysis implements PlugInFilter {
       if (doCircularity) {  // 4pi*area/perimeter^2
         rt.addValue("*Circularity", (4*Math.PI*stats.area)/Math.pow(perim,2));
       }
-      /*
-      if (doCentroid) {  // Based on bounding rectangle
-        rt.addValue("*Centroid: x", centroid[0]);
-        rt.addValue("*Centroid: y", centroid[1]);
-      }
-      */
 
       /*Grey*/
       if (doVariance) {
@@ -903,7 +818,11 @@ public class Seeds_Analysis implements PlugInFilter {
         rt.addValue("**Smothness R", getSmoothness(Math.pow(stats.stdDev, 2)));
       }
 
-      // GLCM
+      if(doGLCM){
+        rt.addValue("test", 0);
+      }
+
+      /* GLCM
 
       if (doASM) {
         double asm = 0;
@@ -940,6 +859,7 @@ public class Seeds_Analysis implements PlugInFilter {
       if (doShade) {
         rt.addValue("Shade", 10);
       }
+*/
 
       if(typeRGB){
         impPlusesRGB[0].setRoi(roi); //red
@@ -1009,7 +929,7 @@ public class Seeds_Analysis implements PlugInFilter {
       return (Math.abs(carea / 2.0));
     }
 
-    private final double getPerimeter(Polygon p) {
+    private double getPerimeter(Polygon p) {
       if (p == null) return Double.NaN;
       double cperimeter = 0.0;
 
@@ -1235,8 +1155,6 @@ public class Seeds_Analysis implements PlugInFilter {
     /* Metodi Andre */
     private double[] getCentroid(Roi roi){
       double[] centroid = new double[2]; // x, y
-
-      // Metodo 3
       centroid[0] = roi.getStatistics().xCentroid;// - roi.getStatistics().roiX;
       centroid[1] = roi.getStatistics().yCentroid;// - roi.getStatistics().roiY;
 
@@ -1252,9 +1170,9 @@ public class Seeds_Analysis implements PlugInFilter {
       double sumR = 0;
       double variance = 0;
       double[] radii = new double[n];
-      double[] radiiValues = new double[5]; //minR, maxR, media, variance, stdDev
-      radiiValues[0] = Double.MAX_VALUE; //min
-      radiiValues[1] = -1; //max
+      double[] radiiValues = new double[5]; // minR, maxR, media, variance, stdDev
+      radiiValues[0] = Double.MAX_VALUE;    // min
+      radiiValues[1] = -1;                  //max
 
       for(i = 0; i < n; i++){
         radii[i] = distance((int)x_cg, (int)y_cg, p.xpoints[i], p.ypoints[i]);
@@ -1315,37 +1233,6 @@ public class Seeds_Analysis implements PlugInFilter {
       double s1, s2;
       double[] IS = new double[2];
 
-/*
-      for(int i = realX; i < realX + r.width; i++) {
-        if (roi.contains(i, realY)) {
-          startH[0] = i;
-          startH[1] = realY;
-          break;
-        }
-      }
-
-      for(int i = realX; i < realX + r.width; i++){
-        if(roi.contains(i, realY - r.height)){
-          endH[0] = i;
-          endH[1] = realY - r.height;
-          break;
-        }
-      }
-      for(int i = realY - r.height; i < realY ; i++){
-        if(roi.contains(realX, i)){
-          startW[0] = realX;
-          startW[1] = i;
-          break;
-        }
-      }
-      for(int i = realY - r.height; i < realY ; i++){
-        if(roi.contains(realX + r.width, i)){
-          endW[0] = realX + r.width;
-          endW[1] = i;
-          break;
-        }
-      }
-*/
       s1 = (0.5) * ((startW[0] - endW[0]) * (startH[1] - endW[1]) - (startW[1] - endW[1]) * (startH[0] - endW[0]));
       s2 = (0.5) * ((startW[0] - endW[0]) * (endW[1] - endH[1]) - (startW[1] - endW[1]) * (endW[0] - endH[0]));
 

@@ -1218,41 +1218,205 @@ public class Seeds_Analysis implements PlugIn
 
     //==========================================================
     class GLCM_TextureToo implements PlugInFilter {
-      int d = 1;
-    	int phi = 0;
-    	boolean symmetry = true;
-    	boolean doASM = true;
-    	boolean doContrast = true;
-    	boolean doCorrelation = true;
-    	boolean doIDM = true;
-    	boolean doEntropy = true;
-    	boolean doEnergy = true;
-    	boolean doInertia = true;
-    	boolean doHomogeneity = true;
-    	boolean doProminence = true;
-    	boolean doVariance = true;
-    	boolean doShade = true;
-      protected int test = 0;
+        int d = 1;
+        int phi = 0;
+        boolean symmetry = true;
+        boolean doASM = true;
+        boolean doContrast = true;
+        boolean doCorrelation = true;
+        boolean doIDM = true;
+        boolean doEntropy = true;
+        boolean doEnergy = true;
+        boolean doInertia = true;
+        boolean doHomogeneity = true;
+        boolean doProminence = true;
+        boolean doVariance = true;
+        boolean doShade = true;
+        protected double test = 0.0;
 
-    	ResultsTable rt = ResultsTable.getResultsTable();
+        ResultsTable rt = ResultsTable.getResultsTable();
 
-      public int getResults()
-      {
-        return test;
-      }
+        public double getResults()
+        {
+            return test;
+        }
 
-    	public int setup(String arg, ImagePlus imp) {
-    		if (imp!=null && !showDialog()) return DONE;
-    		//perhaps not reseting the resultsTable would be better... ??
-    		//rt.reset();
-        IJ.log("Inside Setup");
-    		return DOES_8G+DOES_STACKS+SUPPORTS_MASKING;
-    	}
+        public int setup(String arg, ImagePlus imp)
+        {
+            if (imp!=null && !showDialog())
+            {
+                return DONE;
+            }
+            //perhaps not reseting the resultsTable would be better... ??
+            //rt.reset();
+            return DOES_8G+DOES_STACKS+SUPPORTS_MASKING;
+        }
 
-      public void run(ImageProcessor ip)
-      {
-        test = 24;
-      }
+        public void run(ImageProcessor ip)
+        {
+
+            // use the bounding rectangle ROI to roughly limit processing
+            Rectangle roi = ip.getRoi();
+
+            // get byte arrays for the image pixels and mask pixels
+            int width = ip.getWidth();
+            int height = ip.getHeight();
+            byte [] pixels = (byte []) ip.getPixels();
+            byte [] mask = ip.getMaskArray();
+
+            // value = value at pixel of interest; dValue = value of pixel at offset
+            int value;
+            int dValue;
+            double totalPixels = roi.height * roi.width;
+            if (symmetry) totalPixels = totalPixels * 2;
+            double pixelProgress = 0;
+            double pixelCount = 0;
+
+            //====================================================================================================
+            // compute the Gray Level Correlation Matrix
+
+            int offsetX = 1;
+            int offsetY = 0;
+            double [][] glcm = new double [256][256];
+
+            // set our offsets based on the selected angle
+            if (phi == 0)
+            {
+                offsetX = d;
+                offsetY = 0;
+            }
+            else if (phi == 45)
+            {
+                offsetX = d;
+                offsetY = -d;
+            }
+            else if (phi == 90)
+            {
+                offsetX = 0;
+                offsetY = -d;
+            }
+            else if (phi == 135)
+            {
+                offsetX = -d;
+                offsetY = -d;
+            }
+            else
+            {
+                // the angle is not one of the options
+                IJ.showMessage("The requested angle,"+phi+", is not one of the supported angles (0,45,90,135)");
+            }
+
+            // loop through the pixels in the ROI bounding rectangle
+            for (int y=roi.y; y<(roi.y + roi.height); y++) 	{
+                for (int x=roi.x; x<(roi.x + roi.width); x++)	 {
+                    // check to see if the pixel is in the mask (if it exists)
+                    if ((mask == null) || ((0xff & mask[(((y-roi.y)*roi.width)+(x-roi.x))]) > 0) ) {
+                        // check to see if the offset pixel is in the roi
+                        int dx = x + offsetX;
+                        int dy = y + offsetY;
+                        if ( ((dx >= roi.x) && (dx < (roi.x+roi.width))) && ((dy >= roi.y) && (dy < (roi.y+roi.height))) ) {
+                            // check to see if the offset pixel is in the mask (if it exists)
+                            if ((mask == null) || ((0xff & mask[(((dy-roi.y)*roi.width)+(dx-roi.x))]) > 0) ) {
+                                value = 0xff & pixels[(y*width)+x];
+                                dValue = 0xff & pixels[(dy*width) + dx];
+                                glcm [value][dValue]++;
+                                pixelCount++;
+                            }
+                            // if symmetry is selected, invert the offsets and go through the process again
+                            if (symmetry) {
+                                dx = x - offsetX;
+                                dy = y - offsetY;
+                                if ( ((dx >= roi.x) && (dx < (roi.x+roi.width))) && ((dy >= roi.y) && (dy < (roi.y+roi.height))) ) {
+                                    // check to see if the offset pixel is in the mask (if it exists)
+                                    if ((mask == null) || ((0xff & mask[(((dy-roi.y)*roi.width)+(dx-roi.x))]) > 0) ) {
+                                        value = 0xff & pixels[(y*width)+x];
+                                        dValue = 0xff & pixels[(dy*width) + dx];
+                                        glcm [dValue][value]++;
+                                        pixelCount++;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    pixelProgress++;
+                    IJ.showProgress(pixelProgress/totalPixels);
+                }
+            }
+
+            //=====================================================================================================
+
+            // convert the GLCM from absolute counts to probabilities
+            for (int i=0; i<256; i++)
+            {
+                for (int j=0; j<256; j++)
+                {
+                    glcm[i][j] = (glcm[i][j])/(pixelCount);
+                }
+            }
+
+            //=====================================================================================================
+            // calculate meanx, meany, stdevx and stdevy for the glcm
+            double [] px = new double [256];
+            double [] py = new double [256];
+            double meanx=0.0;
+            double meany=0.0;
+            double stdevx=0.0;
+            double stdevy=0.0;
+
+            // Px(i) and Py(j) are the marginal-probability matrix; sum rows (px) or columns (py)
+            // First, initialize the arrays to 0
+            for (int i=0;  i<256; i++)
+            {
+                px[i] = 0.0;
+                py[i] = 0.0;
+            }
+
+            // sum the glcm rows to Px(i)
+            for (int i=0;  i<256; i++)
+            {
+                for (int j=0; j<256; j++)
+                {
+                    px[i] += glcm [i][j];
+                }
+            }
+
+            // sum the glcm rows to Py(j)
+            for (int j=0;  j<256; j++)
+            {
+                for (int i=0; i<256; i++)
+                {
+                    py[j] += glcm [i][j];
+                }
+            }
+
+            // calculate meanx and meany
+            for (int i=0;  i<256; i++)
+            {
+                meanx += (i*px[i]);
+                meany += (i*py[i]);
+            }
+
+            // calculate stdevx and stdevy
+            for (int i=0;  i<256; i++)
+            {
+                stdevx += ((Math.pow((i-meanx),2))*px[i]);
+                stdevy += ((Math.pow((i-meany),2))*py[i]);
+            }
+
+            //=====================================================================================================
+            // calculate the angular second moment (asm)
+            if(doASM == true)
+            {
+                double asm = 0.0;
+                for (int i=0;  i<256; i++)  {
+                    for (int j=0; j<256; j++) {
+                        asm += (glcm[i][j]*glcm[i][j]);
+                    }
+                }
+                //rt.setValue("Angular Second Moment", row, asm);
+                test = asm;
+            }
+        }
 
     public void Oldrun(ImageProcessor ip) {
 
@@ -1624,14 +1788,17 @@ public class Seeds_Analysis implements PlugIn
 
     //=========================================================================================
     	// implementation of the dialog
-    	boolean showDialog() {
-        GenericDialog gd = new GenericDialog("GLCM Texture v0.001");
+    	boolean showDialog()
+        {
+            GenericDialog gd = new GenericDialog("GLCM Texture v0.001");
     		gd.addNumericField ("Enter the size of the step in pixels",  d, 0);
 
     		String [] angles={"0", "45", "90", "135"};
     		gd.addChoice("Select the direction of the step", angles, Integer.toString(phi));
     		gd.addCheckbox("Symmetrical GLCM?", symmetry);
-    		gd.addMessage("Calculate which parameters?");
+
+/*
+            gd.addMessage("Calculate which parameters?");
     		gd.addCheckbox("Angular Second Moment  ", doASM);
     		gd.addCheckbox("Contrast  ", doContrast);
     		gd.addCheckbox ("Correlation  ", doCorrelation);
@@ -1643,14 +1810,14 @@ public class Seeds_Analysis implements PlugIn
     		gd.addCheckbox ("Prominence   ", doProminence);
     		gd.addCheckbox ("Variance   ", doVariance);
     		gd.addCheckbox ("Shade   ", doShade);
-
+*/
     		gd.showDialog();
     		if (gd.wasCanceled()) return false;
 
     		d=(int) gd.getNextNumber();
     		phi=Integer.parseInt(gd.getNextChoice());
     		symmetry=gd.getNextBoolean();
-    		doASM=gd.getNextBoolean();
+/*    		doASM=gd.getNextBoolean();
     		doContrast=gd.getNextBoolean();
     		doCorrelation=gd.getNextBoolean();
     		doIDM=gd.getNextBoolean();
@@ -1661,7 +1828,7 @@ public class Seeds_Analysis implements PlugIn
     		doProminence=gd.getNextBoolean();
     		doVariance=gd.getNextBoolean();
     		doShade=gd.getNextBoolean();
-
+*/
     		return true;
     	}
     }

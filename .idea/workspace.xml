@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="50c88f2b-0a33-4fe9-bc2c-de2f35435265" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-intellij/plugins/GLCM_TextureToo.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-intellij/plugins/Run_Macro.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-intellij/plugins/Seeds_Analysis$Cells_Analyzer.class" beforeDir="false" afterPath="$PROJECT_DIR$/project-intellij/plugins/Seeds_Analysis$Cells_Analyzer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-intellij/plugins/Seeds_Analysis.class" beforeDir="false" afterPath="$PROJECT_DIR$/project-intellij/plugins/Seeds_Analysis.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-intellij/plugins/Seeds_Analysis.java" beforeDir="false" afterPath="$PROJECT_DIR$/project-intellij/plugins/Seeds_Analysis.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-intellij/plugins/_GD Ritaglia Immagini 5.ijm" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java" beforeDir="false" afterPath="$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java" afterDir="false" />
-    </list>
+    <list default="true" id="50c88f2b-0a33-4fe9-bc2c-de2f35435265" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -20,16 +11,12 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="Seeds_Analysis.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="364">
-              <caret line="182" column="10" lean-forward="true" selection-start-line="182" selection-start-column="10" selection-end-line="182" selection-end-column="10" />
-              <folding>
-                <element signature="e#40562#40563#0" expanded="true" />
-                <element signature="e#40610#40611#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="4144">
+              <caret line="434" column="10" selection-start-line="434" selection-start-column="10" selection-end-line="434" selection-end-column="10" />
             </state>
           </provider>
         </entry>
@@ -170,11 +157,12 @@
       <updated>1562658439741</updated>
       <workItem from="1562658443193" duration="314000" />
       <workItem from="1562660930793" duration="270000" />
+      <workItem from="1564038262568" duration="6000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="584000" />
+    <option name="totallyTimeSpent" value="590000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="810" extended-state="0" />
@@ -188,25 +176,25 @@
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.32880434" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
       <window_info anchor="right" id="Database" order="3" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32880434" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="2" />
       <window_info anchor="right" id="Theme Preview" order="3" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32880434" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -218,12 +206,15 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="364">
+        <state relative-caret-position="2730">
           <caret line="182" column="10" lean-forward="true" selection-start-line="182" selection-start-column="10" selection-end-line="182" selection-end-column="10" />
-          <folding>
-            <element signature="e#40562#40563#0" expanded="true" />
-            <element signature="e#40610#40611#0" expanded="true" />
-          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4144">
+          <caret line="434" column="10" selection-start-line="434" selection-start-column="10" selection-end-line="434" selection-end-column="10" />
         </state>
       </provider>
     </entry>

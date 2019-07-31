@@ -362,8 +362,7 @@ mean = (meanx + meany)/2;
 
 //===============================================================================================
 // calculate the shade (Walker, et al., 1995; Connors, et al. 1984)
-	if(doShade == true)
-  {
+	if (doShade == true){
 		double shade = 0.0;
 
 	// calculate the shade parameter

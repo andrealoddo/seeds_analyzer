@@ -779,7 +779,7 @@ public class Seeds_Analysis implements PlugIn
 
             if(doStandardDeviation)
             {
-                rt.addValue("**Standard deviation", stats.stdDev);
+                rt.addValue("**StD", stats.stdDev);
             }
 
             if(doMean)
@@ -807,7 +807,7 @@ public class Seeds_Analysis implements PlugIn
             if(doSquareIntensitySum)
             {
                 int intensitySum = getIntensitySum(hist);
-                rt.addValue("**Square intensity sum (SqI sum)", Math.sqrt((double) intensitySum));
+                rt.addValue("**SqI sum", Math.sqrt((double) intensitySum));
             }
 
             if(doUniformity)
@@ -825,18 +825,18 @@ public class Seeds_Analysis implements PlugIn
             if(doGLCM)
             {
               glcm.exec(roi);
-              rt.addValue("ASM", glcm.getASM());
-              rt.addValue("IDM", glcm.getIDM());
-              rt.addValue("Contrast", glcm.getContrast());
-              rt.addValue("Energy", glcm.getEnergy());
-              rt.addValue("Entropy", glcm.getEntropy());
-              rt.addValue("Homogeneity", glcm.getHomogeneity());
-              rt.addValue("Variance", glcm.getVariance());
-              rt.addValue("Shade", glcm.getShade());
-              rt.addValue("Prominence", glcm.getProminence());
-              rt.addValue("Inertia", glcm.getInertia());
-              rt.addValue("Correlation", glcm.getCorrelation());
-              rt.addValue("Sum", glcm.getSum());
+              rt.addValue("GLCM-ASM", glcm.getASM());
+              rt.addValue("GLCM-IDM", glcm.getIDM());
+              rt.addValue("GLCM-Contrast", glcm.getContrast());
+              rt.addValue("GLCM-Energy", glcm.getEnergy());
+              rt.addValue("GLCM-Entropy", glcm.getEntropy());
+              rt.addValue("GLCM-Homogeneity", glcm.getHomogeneity());
+              rt.addValue("GLCM-Variance", glcm.getVariance());
+              rt.addValue("GLCM-Shade   ", glcm.getShade());
+              rt.addValue("GLCM-Prominence", glcm.getProminence());
+              rt.addValue("GLCM-Inertia", glcm.getInertia());
+              rt.addValue("GLCM-Corr", glcm.getCorrelation());
+              //rt.addValue("GLCM-Sum", glcm.getSum());
             }
 
             if(typeRGB)

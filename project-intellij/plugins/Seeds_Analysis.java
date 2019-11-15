@@ -38,7 +38,8 @@ import java.lang.*;
 * Seeds_Analysis e' una classe volta alla misurazione di elementi all'interno di una immagine (binaria+grey+RGB).
 * Si appoggia al Plugin "ThresholdAdjuster" per poter individuare le zone e gli oggetti da analizzare.
 * Implementa Plugin ma al suo interno vi e' una classe Cells_Analyzer che estende a sua volta il PlugInFilter "ParticleAnalyzer"
-* aggiungendo misure non presenti in quest'ultimo.*/
+* aggiungendo misure non presenti in quest'ultimo.
+*/
 
 public class Seeds_Analysis implements PlugIn
 {
@@ -47,6 +48,7 @@ public class Seeds_Analysis implements PlugIn
     protected ImagePlus impPlusesRGB [];
     protected ImagePlus impPlusesHSB [];
     protected ImagePlus imp;
+    protected ImagePlus impG;
     protected ImagePlus imLightBackground, imDarkBackground;
     protected ImageCalculator ic;
     protected boolean typeRGB;
@@ -58,30 +60,34 @@ public class Seeds_Analysis implements PlugIn
     protected int flags;
 
     /* Methods */
-    /* Metodo run necessaria per i PlugIn
-    * Memorizza l'immagine in ingresso
-    * richiama il metodo catch_parasite_running dandogli in ingresso l'immagine */
     public void run(String arg)
     {
         imp = IJ.getImage();
+        impG = (ImagePlus) imp.clone();
+
         if (imp.getType() == ImagePlus.COLOR_RGB)
         {
             ChannelSplitter ch = new ChannelSplitter();
             impPlusesRGB = ch.split(imp);
             impPlusesHSB = getImagePlusHSB(imp);
             typeRGB = true;
+
+            ImageConverter ic = new ImageConverter(impG);
+            ic.convertToGray8();
+            impG.updateAndDraw();
         }
 
         cells_analyzer = new Cells_Analyzer();
-        glcm = new GLCM(imp);
+        glcm = new GLCM(impG);
 
         flags = cells_analyzer.setup("", imp);
 
-        /* Controllo */
+        // Controllo
         if (flags == PlugInFilter.DONE)
         {
             return;
         }
+
         cells_analyzer.run(imp.getProcessor());
         Analyzer.getResultsTable().show("Results");
     }
@@ -184,6 +190,142 @@ public class Seeds_Analysis implements PlugIn
             return false;
         }
 
+        private void setBW(String[] labels, boolean[] states)
+        {
+            labels[0] = "Area                  ";
+            states[0] = false;
+            labels[1] = "Perimeter             ";
+            states[1] = false;
+            labels[2] = "Feret's diameter    ";
+            states[2] = false;
+            labels[3] = "Convex Area*           ";
+            states[3] = false;
+            labels[4] = "Convex Perimeter*     ";
+            states[4] = false;
+            labels[5] = "ArEquivD*             ";
+            states[5] = false;
+            labels[6] = "AspRatio*              ";
+            states[6] = false;
+            labels[7] = "PerEquivD*            ";
+            states[7] = false;
+            labels[8] = "MinR and MaxR*        ";
+            states[8] = false;
+            labels[9] = "Roundness*            ";
+            states[9] = false;
+            labels[10] = "EquivEllAr*           ";
+            states[10] = false;
+            labels[11] = "Compactness*          ";
+            states[11] = false;
+            labels[12] = "Solidity*             ";
+            states[12] = false;
+            labels[13] = "ThinnessR*           ";
+            states[13] = false;
+            labels[14] = "RFactor*             ";
+            states[14] = false;
+            labels[15] = "Convexity*             ";
+            states[15] = false;
+            labels[16] = "Concavity*              ";
+            states[16] = false;
+            labels[17] = "ArBBox*                ";
+            states[17] = false;
+            labels[18] = "Rectang*               ";
+            states[18] = false;
+            labels[19] = "ModRatio*              ";
+            states[19] = false;
+            labels[20] = "Sphericity*            ";
+            states[20] = false;
+            labels[21] = "Elongation*            ";
+            states[21] = false;
+            labels[22] = "NormPeriIndex*         ";
+            states[22] = false;
+            labels[23] = "HaralickRatio*         ";
+            states[23] = false;
+            labels[24] = "Bending Energy*        ";
+            states[24] = false;
+            labels[25] = "DS**        ";
+            states[25] = false;
+            labels[26] = "Jaggedness**       ";
+            states[26] = false;
+            labels[27] = "Endocarp**              ";
+            states[27] = false;
+            labels[28] = "Breadth**               ";
+            states[28] = false;
+            labels[29] = "AvgRadius**            ";
+            states[29] = false;
+            labels[30] = "VarianceRadius**        ";
+            states[30] = false;
+            labels[31] = "Circularity**           ";
+            states[31] = false;
+        }
+
+        private void setGray(String[] labelsG, boolean[] statesG)
+        {
+
+            labelsG[0] = "Min and Max              ";
+            statesG[0] = false;
+            labelsG[1] = "Mean                      ";
+            statesG[1] = false;
+            labelsG[2] = "StD                       ";
+            statesG[2] = false;
+            labelsG[3] = "Median                    ";
+            statesG[3] = false;
+            labelsG[4] = "Mode                      ";
+            statesG[4] = false;
+            labelsG[5] = "Skewness                  ";
+            statesG[5] = false;
+            labelsG[6] = "Kurtosis                  ";
+            statesG[6] = false;
+            labelsG[7] = "Intensity Sum*            ";
+            statesG[7] = false;
+            labelsG[8] = "SqI sum*                  ";
+            statesG[8] = false;
+            labelsG[9] = "Uniformity*               ";
+            statesG[9] = false;
+            labelsG[10] = "Entropy*                 ";
+            statesG[10] = false;
+            labelsG[11] = "Variance*                ";
+            statesG[11] = false;
+            labelsG[12] = "Smoothness R*            ";
+            statesG[12] = false;
+            labelsG[13] = "GLCM                ";
+            statesG[13] = false;
+        }
+
+        private void setRGB(String[] labelsRGB, boolean[] statesRGB)
+        {
+            labelsRGB[0] = "Mean R                      ";
+            statesRGB[0] = false;
+            labelsRGB[1] = "StD R                       ";
+            statesRGB[1] = false;
+            labelsRGB[2] = "Sqrt Mean R                 ";
+            statesRGB[2] = false;
+            labelsRGB[3] = "Mean G                      ";
+            statesRGB[3] = false;
+            labelsRGB[4] = "StD G                       ";
+            statesRGB[4] = false;
+            labelsRGB[5] = "Sqrt Mean G                 ";
+            statesRGB[5] = false;
+            labelsRGB[6] = "Mean B                      ";
+            statesRGB[6] = false;
+            labelsRGB[7] = "StD B                       ";
+            statesRGB[7] = false;
+            labelsRGB[8] = "Sqrt Mean B                 ";
+            statesRGB[8] = false;
+            labelsRGB[9] = "Sum Mean RGB                ";
+            statesRGB[9] = false;
+            labelsRGB[10] = "Mean H                     ";
+            statesRGB[10] = false;
+            labelsRGB[11] = "StD H                      ";
+            statesRGB[11] = false;
+            labelsRGB[12] = "Mean S                     ";
+            statesRGB[12] = false;
+            labelsRGB[13] = "StD S                      ";
+            statesRGB[13] = false;
+            labelsRGB[14] = "Mean B                     ";
+            statesRGB[14] = false;
+            labelsRGB[15] = "StD B                      ";
+            statesRGB[15] = false;
+        }
         /* Metodo della creazione della finestra di dialogo, visualizzazione del:
         * - checkbox per selezionare ogni misura
         * - checkbox per selezionare misure singole */
@@ -196,211 +338,32 @@ public class Seeds_Analysis implements PlugIn
             Font fontSpace = new Font("font", Font.PLAIN, 8);
 
             gd.addMessage("Select the measures for B&W", font, Color.black);
-            String[] labels = new String[3];
-            boolean[] states = new boolean[3];
+            String[] labelsBW = new String[32];
+            boolean[] statesBW = new boolean[32];
             gd.addCheckbox("Select All", false);
-            labels[0] = "Area                  ";
-            states[0] = false;
-            labels[1] = "Perimeter             ";
-            states[1] = false;
-            labels[2] = "Feret's diameter    ";
-            states[2] = false;
-
-            gd.setInsets(1, 0, 0);
-            gd.addCheckboxGroup(1, 4, labels, states);
-            gd.addMessage(" ", fontSpace, Color.black);
-
-            String[] labels1 = new String[12];
-            boolean[] states1 = new boolean[12];
-            labels1[0] = "Convex Area*           ";
-            states1[0] = false;
-            labels1[1] = "Convex Perimeter*     ";
-            states1[1] = false;
-            labels1[2] = "ArEquivD*             ";
-            states1[2] = false;
-            labels1[3] = "AspRatio*              ";
-            states1[3] = false;
-            labels1[4] = "PerEquivD*            ";
-            states1[4] = false;
-            labels1[5] = "MinR and MaxR*        ";
-            states1[5] = false;
-            labels1[6] = "Roundness*            ";
-            states1[6] = false;
-            labels1[7] = "EquivEllAr*           ";
-            states1[7] = false;
-            labels1[8] = "Compactness*          ";
-            states1[8] = false;
-            labels1[9] = "Solidity*             ";
-            states1[9] = false;
-            labels1[10] = "ThinnessR*           ";
-            states1[10] = false;
-            labels1[11] = "RFactor*             ";
-            states1[11] = false;
-
+            setBW(labelsBW, statesBW);
             gd.setInsets(0, 0, 0);
-            gd.addCheckboxGroup(3, 5, labels1, states1);
+            gd.addCheckboxGroup(8, 4, labelsBW, statesBW);
             gd.addMessage(" ", fontSpace, Color.black);
 
-            String[] labels2 = new String[11];
-            boolean[] states2 = new boolean[11];
-            labels2[0] = "Convexity*             ";
-            states2[0] = false;
-            labels2[1] = "Concavity*              ";
-            states2[1] = false;
-            labels2[2] = "ArBBox*                ";
-            states2[2] = false;
-            labels2[3] = "Rectang*               ";
-            states2[3] = false;
-            labels2[4] = "ModRatio*              ";
-            states2[4] = false;
-            labels2[5] = "Sphericity*            ";
-            states2[5] = false;
-            labels2[6] = "Elongation*            ";
-            states2[6] = false;
-            labels2[7] = "NormPeriIndex*         ";
-            states2[7] = false;
-            labels2[8] = "HaralickRatio*         ";
-            states2[8] = false;
-            labels2[9] = "Bending Energy*        ";
-            states2[9] = false;
-            labels2[10] = "DS**        ";
-            states2[10] = false;
-
-            gd.setInsets(0, 0, 0);
-            gd.addCheckboxGroup(3, 5, labels2, states2);
-            gd.addMessage(" ", fontSpace, Color.black);
-
-            String[] labels5 = new String[6];
-            boolean[] states5 = new boolean[6];
-            labels5[0] = "Jaggedness**       ";
-            states5[0] = false;
-            labels5[1] = "Endocarp**              ";
-            states5[1] = false;
-            labels5[2] = "Breadth**               ";
-            states5[2] = false;
-            labels5[3] = "AvgRadius**            ";
-            states5[3] = false;
-            labels5[4] = "VarianceRadius**        ";
-            states5[4] = false;
-            labels5[5] = "Circularity**           ";
-            states5[5] = false;
-
-            gd.setInsets(0, 0, 0);
-            gd.addCheckboxGroup(2, 4, labels5, states5);
-            gd.addMessage(" ", fontSpace, Color.black);
 
             gd.addMessage("Select the measures for Grey", font, Color.GRAY);
-            if(typeRGB)
-            {
-                String[] labels3 = new String[12];
-                boolean[] states3 = new boolean[12];
-                gd.addCheckbox("Select All", false);
-                labels3[0] = "Mean                      ";
-                states3[0] = false;
-                labels3[1] = "Skewness                  ";
-                states3[1] = false;
-                labels3[2] = "Intensity Sum*            ";
-                states3[2] = false;
-                labels3[3] = "Mode                      ";
-                states3[3] = false;
-                labels3[4] = "Kurtosis                  ";
-                states3[4] = false;
-                labels3[5] = "Entropy*                  ";
-                states3[5] = false;
-                labels3[6] = "Uniformity*               ";
-                states3[6] = false;
-                labels3[7] = "SqI sum*                  ";
-                states3[7] = false;
-                labels3[8] = "Std deviation            ";
-                states3[8] = false;
-                labels3[9] = "Variance*                ";
-                states3[9] = false;
-                labels3[10] = "Median                   ";
-                states3[10] = false;
-                labels3[11] = "Smoothness R*            ";
-                states3[11] = false;
-                gd.setInsets(0, 0, 0);
-                gd.addCheckboxGroup(3, 4, labels3, states3);
-            }
-            else
-            {
-                String[] labels3 = new String[14];
-                boolean[] states3 = new boolean[14];
-                gd.addCheckbox("Select All", false);
-                labels3[0] = "Mean                      ";
-                states3[0] = false;
-                labels3[1] = "Skewness                  ";
-                states3[1] = false;
-                labels3[2] = "Intensity Sum*            ";
-                states3[2] = false;
-                labels3[3] = "Mode                      ";
-                states3[3] = false;
-                labels3[4] = "Kurtosis                  ";
-                states3[4] = false;
-                labels3[5] = "Entropy*                  ";
-                states3[5] = false;
-                labels3[6] = "Uniformity*               ";
-                states3[6] = false;
-                labels3[7] = "SqI sum*                  ";
-                states3[7] = false;
-                labels3[8] = "Std deviation             ";
-                states3[8] = false;
-                labels3[9] = "Variance*                 ";
-                states3[9] = false;
-                labels3[10] = "Median                   ";
-                states3[10] = false;
-                labels3[11] = "Smoothness R*            ";
-                states3[11] = false;
-                labels3[12] = "Temp GLCM                ";
-                states3[12] = false;
-                labels3[13] = "Min and Max              ";
-                states3[13] = false;
-
-                gd.setInsets(0, 0, 0);
-                gd.addCheckboxGroup(4, 4, labels3, states3);
-            }
+            String[] labelsG = new String[14];
+            boolean[] statesG = new boolean[14];
+            gd.addCheckbox("Select All", false);
+            setGray(labelsG, statesG);
+            gd.setInsets(0, 0, 0);
+            gd.addCheckboxGroup(4, 4, labelsG, statesG);
 
             if(typeRGB)
             {
                 gd.addMessage("Select the measures for RGB", font, Color.red);
+                String[] labelsRGB = new String[16];
+                boolean[] statesRGB = new boolean[16];
                 gd.addCheckbox("Select All", false);
-                String[] labels4 = new String[16];
-                boolean[] states4 = new boolean[16];
-                labels4[0] = "R mean*                      ";
-                states4[0] = false;
-                labels4[1] = "R std deviation*             ";
-                states4[1] = false;
-                labels4[2] = "Square root of mean R*       ";
-                states4[2] = false;
-                labels4[3] = "G mean*                      ";
-                states4[3] = false;
-                labels4[4] = "G std deviation*             ";
-                states4[4] = false;
-                labels4[5] = "Square root of mean G*       ";
-                states4[5] = false;
-                labels4[6] = "B mean*                      ";
-                states4[6] = false;
-                labels4[7] = "B std deviation*             ";
-                states4[7] = false;
-                labels4[8] = "Square root of mean B*       ";
-                states4[8] = false;
-                labels4[9] = "Average RGB colors*          ";
-                states4[9] = false;
-                labels4[10] = "H mean*                     ";
-                states4[10] = false;
-                labels4[11] = "H std deviation*            ";
-                states4[11] = false;
-                labels4[12] = "S mean*                     ";
-                states4[12] = false;
-                labels4[13] = "S std deviation*            ";
-                states4[13] = false;
-                labels4[14] = "Br mean*                    ";
-                states4[14] = false;
-                labels4[15] = "Br std deviation*           ";
-                states4[15] = false;
-
+                setRGB(labelsRGB, statesRGB);
                 gd.setInsets(0, 0, 0);
-                gd.addCheckboxGroup(3, 6, labels4, states4);
+                gd.addCheckboxGroup(4, 4, labelsRGB, statesRGB);
             }
 
             gd.showDialog();
@@ -409,8 +372,8 @@ public class Seeds_Analysis implements PlugIn
                 return false;
             }
 
-            //imageJ
-            if(gd.getNextBoolean())
+            // BW
+            if(gd.getNextBoolean())     // Selected all BW
             {
                 for(int i = 0; i < measureImageJ.length; i++)
                 {
@@ -422,7 +385,7 @@ public class Seeds_Analysis implements PlugIn
                     spam = gd.getNextBoolean();
                 }
             }
-            else
+            else                        // Not selected all BW
             {
                 for(int i = 0; i < measureImageJ.length; i++)
                 {
@@ -434,46 +397,26 @@ public class Seeds_Analysis implements PlugIn
                 }
             }
 
-            //grey
-            if(gd.getNextBoolean())
+            // Gray
+            if(gd.getNextBoolean())     // Selected all Gray
             {
-                if(typeRGB)
+                for (int i = 0; i < measuresGrey.length; i++)
                 {
-                    for (int i = 0; i < measuresGrey.length - 1; i++)
-                    {
-                        measuresGrey[i] = true;
-                        spam = gd.getNextBoolean();
-                    }
-                }
-                else
-                {
-                    for(int i = 0; i < measuresGrey.length; i++)
-                    {
-                        measuresGrey[i] = true;
-                    }
+                    measuresGrey[i] = true;
+                    spam = gd.getNextBoolean();
                 }
             }
-            else
+            else                        // Not selected all Gray
             {
-                if(typeRGB)
+                for(int i = 0; i < measuresGrey.length; i++)
                 {
-                    for(int i = 0; i < measuresGrey.length-1; i++)
-                    {
-                        measuresGrey[i] = gd.getNextBoolean();
-                    }
+                    measuresGrey[i] =  gd.getNextBoolean();;
+                }
+            }
 
-                }
-                else
-                {
-                    for(int i = 0; i < measuresGrey.length-1; i++)
-                    {
-                        measuresGrey[i] = gd.getNextBoolean();
-                    }
-                }
-            }
             if(typeRGB)
             {
-                if(gd.getNextBoolean())
+                if(gd.getNextBoolean())     // Selected all RGB
                 {
                     for (int i = 0; i < measureRGB.length; i++)
                     {
@@ -481,7 +424,7 @@ public class Seeds_Analysis implements PlugIn
                         spam = gd.getNextBoolean();
                     }
                 }
-                else
+                else                        // Not selected all RGB
                 {
                     for(int i = 0; i < measureRGB.length; i++)
                     {
@@ -494,7 +437,6 @@ public class Seeds_Analysis implements PlugIn
 
         private void setMeasurementsExtended()
         {
-
             // BW
             doArea = measureImageJ[0];
             doPerimeter = measureImageJ[1];
@@ -533,20 +475,20 @@ public class Seeds_Analysis implements PlugIn
             doCircularity = measuresBW[28];
 
             // Grey
-            doMean = measuresGrey[0];
-            doSkewness = measuresGrey[1]; if (doSkewness) { measure += SKEWNESS; }
-            doIntensitySum = measuresGrey[2];
-            doMode = measuresGrey[3];
-            doKurtois = measuresGrey[4]; if (doKurtois) { measure += KURTOSIS; }
-            doEntropy = measuresGrey[5];
-            doUniformity = measuresGrey[6];
-            doSquareIntensitySum = measuresGrey[7];
-            doStandardDeviation = measuresGrey[8];
-            doVariance = measuresGrey[9];
-            doMedian = measuresGrey[10]; if (doMedian) { measure += MEDIAN; }
-            doSmothness = measuresGrey[11];
-            doGLCM = measuresGrey[12];
-            if(!typeRGB) doMinandMax= measuresGrey[13]; if(doMinandMax) { measure += MIN_MAX;}
+            doMinandMax = measuresGrey[0]; if(doMinandMax){ measure += MIN_MAX; }
+            doMean = measuresGrey[1];
+            doStandardDeviation = measuresGrey[2];
+            doMedian = measuresGrey[3]; if(doMedian){ measure += MEDIAN; }
+            doMode = measuresGrey[4];
+            doSkewness = measuresGrey[5]; if(doSkewness){ measure += SKEWNESS; }
+            doKurtois = measuresGrey[6]; if(doKurtois){ measure += KURTOSIS; }
+            doIntensitySum = measuresGrey[7];
+            doSquareIntensitySum  = measuresGrey[8];
+            doUniformity = measuresGrey[9];
+            doEntropy = measuresGrey[10];
+            doVariance = measuresGrey[11];
+            doSmothness = measuresGrey[12];
+            doGLCM = measuresGrey[13];
 
             // RGB
             doMeanRed = measureRGB[0];
@@ -572,7 +514,6 @@ public class Seeds_Analysis implements PlugIn
         protected void saveResults(ImageStatistics stats, Roi roi)
         {
             super.saveResults(stats, roi);
-
 
             /*Settaggio delle misure da aggiungere date dalla checkBox*/
             /*Oggetti e dati necessari per alcune misure*/
@@ -772,56 +713,74 @@ public class Seeds_Analysis implements PlugIn
             }
 
             /* Grey */
-            if(doVariance)
+            if(doMinandMax)
             {
-                rt.addValue("**Variance", Math.pow(stats.stdDev, 2));
-            }
-
-            if(doStandardDeviation)
-            {
-                rt.addValue("**StD", stats.stdDev);
+                //rt.addValue("MinTest", stats.min);
+                //rt.addValue("MaxTest", stats.max);
             }
 
             if(doMean)
             {
-                rt.addValue("**Mean", stats.mean);
+                rt.addValue("Mean", stats.mean);
+            }
+
+            if(doStandardDeviation)
+            {
+                rt.addValue("StD", stats.stdDev);
+            }
+            if(doMedian)
+            {
+                //rt.addValue("MedianTest", stats.median);
             }
 
             if(doMode)
             {
-                rt.addValue("**Mode", stats.dmode);
+                rt.addValue("Mode", stats.dmode);
             }
 
-            if(doEntropy)
+            if(doSkewness)
             {
-                double e = getEntropy(hist, stats.area);
-                rt.addValue("**Entropy", e);
+                //rt.addValue("SkewnessTest", stats.skewness);
+            }
+
+            if(doKurtois)
+            {
+                //rt.addValue("KurtosisTest", stats.kurtosis);
             }
 
             if(doIntensitySum)
             {
                 int intensitySum = getIntensitySum(hist);
-                rt.addValue("**Intensity sum", intensitySum);
+                rt.addValue("Intensity sum", intensitySum);
             }
 
             if(doSquareIntensitySum)
             {
                 int intensitySum = getIntensitySum(hist);
-                rt.addValue("**SqI sum", Math.sqrt((double) intensitySum));
+                rt.addValue("Sqrt Intensity sum", Math.sqrt((double) intensitySum));
             }
 
             if(doUniformity)
             {
+                rt.addValue("Uniformity", getUniformity(hist, stats.area));
+            }
 
-                rt.addValue("**Uniformity", getUniformity(hist, stats.area));
+            if(doEntropy)
+            {
+                double e = getEntropy(hist, stats.area);
+                rt.addValue("Entropy", e);
+            }
+
+            if(doVariance)
+            {
+                rt.addValue("Variance", Math.pow(stats.stdDev, 2));
             }
 
             if(doSmothness)
             {
-                rt.addValue("**Smothness R", getSmoothness(Math.pow(stats.stdDev, 2)));
+                rt.addValue("Smothness R", getSmoothness(Math.pow(stats.stdDev, 2)));
             }
 
-            // test
             if(doGLCM)
             {
               glcm.exec(roi);
@@ -836,7 +795,6 @@ public class Seeds_Analysis implements PlugIn
               rt.addValue("GLCM-Prominence", glcm.getProminence());
               rt.addValue("GLCM-Inertia", glcm.getInertia());
               rt.addValue("GLCM-Corr", glcm.getCorrelation());
-              //rt.addValue("GLCM-Sum", glcm.getSum());
             }
 
             if(typeRGB)
@@ -850,34 +808,38 @@ public class Seeds_Analysis implements PlugIn
                 ImageStatistics stats_b = impPlusesRGB[2].getAllStatistics();
 
                 if(doMeanRed) {
-                    rt.addValue("***Average red color, R mean", stats_r.mean);
+                    rt.addValue("Mean R", stats_r.mean);
                 }
+
+                if(doStdDeviationRed){
+                    rt.addValue("StD R", stats_r.stdDev);
+                }
+
+                if(doSquareRootMeanR){
+                    rt.addValue("Sqrt Mean R", Math.sqrt(stats_r.mean));
+                }
+
                 if(doMeanGreen){
-                    rt.addValue("***Average green color, G mean", stats_g.mean);
+                    rt.addValue("Mean G", stats_g.mean);
                 }
                 if(doMeanBlue){
-                    rt.addValue("***Average blue color, B mean", stats_b.mean);
+                    rt.addValue("Mean B", stats_b.mean);
                 }
-                if(doStdDeviationRed){
-                    rt.addValue("***Red color std deviation, R std", stats_r.stdDev);
-                }
+
                 if(doStdDeviationGreen){
-                    rt.addValue("***Green color std deviation, G std", stats_g.stdDev);
+                    rt.addValue("StD G", stats_g.stdDev);
                 }
                 if(doStdDeviationBlue){
-                    rt.addValue("***Blue color std deviation, B std", stats_b.stdDev);
-                }
-                if(doSquareRootMeanR){
-                    rt.addValue("***Square root of mean R", Math.sqrt(stats_r.mean));
+                    rt.addValue("StD B", stats_b.stdDev);
                 }
                 if(doSquareRootMeanG){
-                    rt.addValue("***Square root of mean G", Math.sqrt(stats_g.mean));
+                    rt.addValue("Sqrt Mean G", Math.sqrt(stats_g.mean));
                 }
                 if(doSquareRootMeanB){
-                    rt.addValue("***Square root of mean B", Math.sqrt(stats_b.mean));
+                    rt.addValue("Sqrt Mean B", Math.sqrt(stats_b.mean));
                 }
                 if(doAverageRGBcolors){
-                    rt.addValue("***Average RGB colors", (stats_b.mean+stats_g.mean+stats_b.mean)/3);
+                    rt.addValue("Sum Mean RGB", (stats_b.mean+stats_g.mean+stats_b.mean)/3);
                 }
 
                 impPlusesHSB[0].setRoi(roi); //hue
@@ -888,13 +850,13 @@ public class Seeds_Analysis implements PlugIn
                 ImageStatistics stats_sa = impPlusesHSB[1].getAllStatistics();
                 ImageStatistics stats_br = impPlusesHSB[2].getAllStatistics();
 
-                if(doMeanHue)rt.addValue("***Average Hue color, H mean", stats_hu.mean);
-                if(doMeanSaturation)rt.addValue("***Average Saturation color, S mean", stats_sa.mean);
-                if(doMeanBrightness)rt.addValue("***Average Brightness color, B mean", stats_br.mean);
+                if(doMeanHue)rt.addValue("Mean H", stats_hu.mean);
+                if(doMeanSaturation)rt.addValue("Mean S", stats_sa.mean);
+                if(doMeanBrightness)rt.addValue("Mean B", stats_br.mean);
 
-                if(doStdDeviationHue)rt.addValue("***Hue color std deviation", stats_hu.stdDev);
-                if(doStdDeviationS)rt.addValue("***Saturation color std deviation", stats_sa.stdDev);
-                if(doStdDeviationBr)rt.addValue("***Brightness color std deviation", stats_br.stdDev);
+                if(doStdDeviationHue)rt.addValue("StD H", stats_hu.stdDev);
+                if(doStdDeviationS)rt.addValue("StD S", stats_sa.stdDev);
+                if(doStdDeviationBr)rt.addValue("StD B", stats_br.stdDev);
             }
         }
 
@@ -1677,6 +1639,5 @@ public class Seeds_Analysis implements PlugIn
       }
 
     }
-
 
 }

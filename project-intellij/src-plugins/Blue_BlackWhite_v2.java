@@ -47,11 +47,11 @@ public class Blue_BlackWhite_v2 implements PlugIn
 
 		String op = gd.getNextRadioButton();
 
-		if (op.contentEquals("Select WHITE and BLACK background images"))
+		if(op.contentEquals("Select WHITE and BLACK background images"))
 		{
 			ImagePlus imDark, imSubtracted;
 			IJ.open("");
-			imp = IJ.getImage(); // #
+			imp = IJ.getImage();
 			IJ.run("Set Scale...", "distance=60.5347 known=6 pixel=1 unit=mm");
 			IJ.run("8-bit");
 			imGray = IJ.getImage();
@@ -73,6 +73,7 @@ public class Blue_BlackWhite_v2 implements PlugIn
 			imSubtracted.close();
 			new WaitForUserDialog("Do you confirm?").show();
 		}
+
 		else if(op.contentEquals("Select BLUE Background image"))
 		{
 

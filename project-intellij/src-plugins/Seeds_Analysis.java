@@ -45,16 +45,14 @@ public class Seeds_Analysis implements PlugIn
 {
 
     /*  Attributes */
-    protected ImagePlus impPlusesRGB [];
-    protected ImagePlus impPlusesHSB [];
-    protected ImagePlus imp;
-    protected ImagePlus impG;
-    protected ImagePlus imLightBackground, imDarkBackground;
+    protected ImagePlus impLightBackground, impDarkBackground;
+    protected ImagePlus imp, impOriginal;
+    protected ImagePlus impGray;
+    protected ImagePlus impRGB[];
+    protected ImagePlus impHSB[];
+    protected ImageProcessor ip, ipColor;
     protected ImageCalculator ic;
-    protected boolean typeRGB;
-    protected String selectedOption;
-    protected String imLightBackgroundPath, imDarkBackgroundPath, imPath;
-    protected String[] DisplayOption = {"Single Input Image", "Double Input Image"};
+    protected boolean typeGray, typeRGB;
     protected Cells_Analyzer cells_analyzer;
     protected GLCM glcm;
     protected int flags;
@@ -62,25 +60,46 @@ public class Seeds_Analysis implements PlugIn
     /* Methods */
     public void run(String arg)
     {
-        imp = IJ.getImage();
-        impG = (ImagePlus) imp.clone();
+        //handleInputImages();
 
-        if (imp.getType() == ImagePlus.COLOR_RGB)
+        // Per domattina: leggi l'immagine, convertila in gray e fai il threshold, ma lavora sulle altre immagini che ti crei
+        // 1) read the image
+        impOriginal = IJ.getImage();
+
+        // 2) backup copy
+        imp = (ImagePlus) impOriginal.duplicate();
+
+        // 3) convert impOriginal it and perform a threshold
+        IJ.run("8-bit");
+        IJ.run("Threshold...");
+        new WaitForUserDialog("Please select the most appropriate threshold. Press Okay to continue.").show();
+
+        // Check if original image is RGB
+        if(imp.getType() == ImagePlus.COLOR_RGB)
         {
-            ChannelSplitter ch = new ChannelSplitter();
-            impPlusesRGB = ch.split(imp);
-            impPlusesHSB = getImagePlusHSB(imp);
             typeRGB = true;
 
-            ImageConverter ic = new ImageConverter(impG);
+            impGray = (ImagePlus) imp.duplicate();
+
+            ChannelSplitter ch = new ChannelSplitter();
+            impRGB = ch.split(imp);
+            impHSB = getImagePlusHSB(imp);
+
+            ImageConverter ic = new ImageConverter(impGray);
             ic.convertToGray8();
-            impG.updateAndDraw();
+
+            imp = impOriginal;
+        }
+        else if(imp.getType() == ImagePlus.GRAY8)
+        {
+            typeGray = true;
+            impGray = (ImagePlus) imp.duplicate();
         }
 
         cells_analyzer = new Cells_Analyzer();
-        glcm = new GLCM(impG);
+        glcm = new GLCM(impGray);
 
-        flags = cells_analyzer.setup("", imp);
+        flags = cells_analyzer.setup("", impOriginal);
 
         // Controllo
         if (flags == PlugInFilter.DONE)
@@ -88,8 +107,63 @@ public class Seeds_Analysis implements PlugIn
             return;
         }
 
-        cells_analyzer.run(imp.getProcessor());
+        cells_analyzer.run(impOriginal.getProcessor());
         Analyzer.getResultsTable().show("Results");
+
+    }
+
+    /*
+        The plugin can receive input in two different ways:
+        1) 2 images, one with dark background and light background
+        2) 1 single RGB image with uniform bluebackground
+    */
+    public void handleInputImages()
+    {
+
+        //imp = IJ.getImage();
+
+        // Input (blue or white/black backgrounds)
+        GenericDialog gd = new GenericDialog("Initial Setting");
+        String items[] = {"Select BLUE Background image", "Select WHITE and BLACK background images"};
+        gd.addRadioButtonGroup("Input Images", items, 2, 1, "Blue Background");
+        gd.showDialog();
+        if (gd.wasCanceled())
+        {
+            IJ.error("PlugIn canceled!");
+            return;
+        }
+
+        String op = gd.getNextRadioButton();
+
+        if(op.contentEquals("Select WHITE and BLACK background images"))
+        {
+            IJ.open("");
+            //imp = IJ.getImage();
+            //IJ.run("Set Scale...", "distance=60.5347 known=6 pixel=1 unit=mm");
+            //IJ.run("8-bit");
+            impLightBackground = IJ.getImage();
+            IJ.open("");
+            //IJ.run("8-bit");
+            impDarkBackground = IJ.getImage();
+            //impDarkBackground.updateAndRepaintWindow();
+            ImageCalculator ic = new ImageCalculator();
+            imp = ic.run("OR create", impLightBackground, impDarkBackground);
+            imp.show();
+            imp = IJ.getImage();
+            ImageProcessor ip = imp.getProcessor();
+            //ip.setAutoThreshold("Default");
+            //IJ.run("Convert to Mask");
+            //IJ.run("Make Binary");
+            //IJ.run("Fill Holes");
+            //IJ.run("Analyze Particles...", "size=3-Infinity show=Masks display clear");
+            imp.changes = false;
+            //imSubtracted.close();
+            new WaitForUserDialog("Do you confirm?").show();
+        }
+        else
+        {
+            IJ.log("WiP");
+        }
     }
 
     /* RGB to HSB */
@@ -260,7 +334,6 @@ public class Seeds_Analysis implements PlugIn
 
         private void setGray(String[] labelsG, boolean[] statesG)
         {
-
             labelsG[0] = "Min and Max              ";
             statesG[0] = false;
             labelsG[1] = "Mean                      ";
@@ -346,7 +419,6 @@ public class Seeds_Analysis implements PlugIn
             gd.addCheckboxGroup(8, 4, labelsBW, statesBW);
             gd.addMessage(" ", fontSpace, Color.black);
 
-
             gd.addMessage("Select the measures for Grey", font, Color.GRAY);
             String[] labelsG = new String[14];
             boolean[] statesG = new boolean[14];
@@ -410,7 +482,7 @@ public class Seeds_Analysis implements PlugIn
             {
                 for(int i = 0; i < measuresGrey.length; i++)
                 {
-                    measuresGrey[i] =  gd.getNextBoolean();;
+                    measuresGrey[i] =  gd.getNextBoolean();
                 }
             }
 
@@ -465,7 +537,7 @@ public class Seeds_Analysis implements PlugIn
             doHaralickRatio = measuresBW[20];
             doBendingEnergy = measuresBW[21];
 
-            // new features, specific for seeds analysis
+            // new BW features, specific for seeds analysis
             doDS = measuresBW[22];
             doJaggedness = measuresBW[23];
             doEndocarp = measuresBW[24];
@@ -475,13 +547,13 @@ public class Seeds_Analysis implements PlugIn
             doCircularity = measuresBW[28];
 
             // Grey
-            doMinandMax = measuresGrey[0]; if(doMinandMax){ measure += MIN_MAX; }
+            doMinandMax = measuresGrey[0]; //if(doMinandMax){ measure += MIN_MAX; }
             doMean = measuresGrey[1];
             doStandardDeviation = measuresGrey[2];
-            doMedian = measuresGrey[3]; if(doMedian){ measure += MEDIAN; }
+            doMedian = measuresGrey[3]; //if(doMedian){ measure += MEDIAN; }
             doMode = measuresGrey[4];
-            doSkewness = measuresGrey[5]; if(doSkewness){ measure += SKEWNESS; }
-            doKurtois = measuresGrey[6]; if(doKurtois){ measure += KURTOSIS; }
+            doSkewness = measuresGrey[5]; //if(doSkewness){ measure += SKEWNESS; }
+            doKurtois = measuresGrey[6]; //if(doKurtois){ measure += KURTOSIS; }
             doIntensitySum = measuresGrey[7];
             doSquareIntensitySum  = measuresGrey[8];
             doUniformity = measuresGrey[9];
@@ -514,6 +586,12 @@ public class Seeds_Analysis implements PlugIn
         protected void saveResults(ImageStatistics stats, Roi roi)
         {
             super.saveResults(stats, roi);
+
+            //if(typeRGB == true)
+            //{
+                impGray.setRoi(roi);
+                stats = impGray.getAllStatistics();
+            //}
 
             /*Settaggio delle misure da aggiungere date dalla checkBox*/
             /*Oggetti e dati necessari per alcune misure*/
@@ -605,13 +683,13 @@ public class Seeds_Analysis implements PlugIn
 
             if(doShape)
             {
-                //Shape = Perimeter2/Area also called Thinness ratio
+                //Shape = Perimeter^2/Area also called Thinness ratio
                 rt.addValue("*ThinnessR", (perim * perim) / stats.area);
             }
 
             if(doRFactor)
             {
-                 //RFactor = Convex_Area /(Feret�?)
+                 //RFactor = Convex_Area /(Feret*pi)
                  rt.addValue("*RFactor", convexArea / (feret[0] * pigreco));
             }
 
@@ -715,8 +793,8 @@ public class Seeds_Analysis implements PlugIn
             /* Grey */
             if(doMinandMax)
             {
-                //rt.addValue("MinTest", stats.min);
-                //rt.addValue("MaxTest", stats.max);
+                rt.addValue("MinTest", stats.min);
+                rt.addValue("MaxTest", stats.max);
             }
 
             if(doMean)
@@ -728,9 +806,10 @@ public class Seeds_Analysis implements PlugIn
             {
                 rt.addValue("StD", stats.stdDev);
             }
+
             if(doMedian)
             {
-                //rt.addValue("MedianTest", stats.median);
+                rt.addValue("MedianTest", stats.median);
             }
 
             if(doMode)
@@ -740,12 +819,12 @@ public class Seeds_Analysis implements PlugIn
 
             if(doSkewness)
             {
-                //rt.addValue("SkewnessTest", stats.skewness);
+                rt.addValue("SkewnessTest", stats.skewness);
             }
 
             if(doKurtois)
             {
-                //rt.addValue("KurtosisTest", stats.kurtosis);
+                rt.addValue("KurtosisTest", stats.kurtosis);
             }
 
             if(doIntensitySum)
@@ -799,64 +878,76 @@ public class Seeds_Analysis implements PlugIn
 
             if(typeRGB)
             {
-                impPlusesRGB[0].setRoi(roi); //red
-                impPlusesRGB[1].setRoi(roi); //green
-                impPlusesRGB[2].setRoi(roi); //blue
+                impRGB[0].setRoi(roi); //red
+                impRGB[1].setRoi(roi); //green
+                impRGB[2].setRoi(roi); //blue
 
-                ImageStatistics stats_r = impPlusesRGB[0].getAllStatistics();
-                ImageStatistics stats_g = impPlusesRGB[1].getAllStatistics();
-                ImageStatistics stats_b = impPlusesRGB[2].getAllStatistics();
+                ImageStatistics stats_r = impRGB[0].getAllStatistics();
+                ImageStatistics stats_g = impRGB[1].getAllStatistics();
+                ImageStatistics stats_b = impRGB[2].getAllStatistics();
 
                 if(doMeanRed) {
-                    rt.addValue("Mean R", stats_r.mean);
-                }
-
-                if(doStdDeviationRed){
-                    rt.addValue("StD R", stats_r.stdDev);
+                    rt.addValue("Mean Red", stats_r.mean);
                 }
 
                 if(doSquareRootMeanR){
-                    rt.addValue("Sqrt Mean R", Math.sqrt(stats_r.mean));
+                    rt.addValue("Sqrt Mean Red", Math.sqrt(stats_r.mean));
+                }
+
+                if(doStdDeviationRed){
+                    rt.addValue("StD Red", stats_r.stdDev);
                 }
 
                 if(doMeanGreen){
-                    rt.addValue("Mean G", stats_g.mean);
+                    rt.addValue("Mean Green", stats_g.mean);
                 }
-                if(doMeanBlue){
-                    rt.addValue("Mean B", stats_b.mean);
+
+                if(doSquareRootMeanG){
+                    rt.addValue("Sqrt Mean Green", Math.sqrt(stats_g.mean));
                 }
 
                 if(doStdDeviationGreen){
-                    rt.addValue("StD G", stats_g.stdDev);
+                    rt.addValue("StD Green", stats_g.stdDev);
                 }
-                if(doStdDeviationBlue){
-                    rt.addValue("StD B", stats_b.stdDev);
+
+                if(doMeanBlue){
+                    rt.addValue("Mean Blue", stats_b.mean);
                 }
-                if(doSquareRootMeanG){
-                    rt.addValue("Sqrt Mean G", Math.sqrt(stats_g.mean));
-                }
+
                 if(doSquareRootMeanB){
-                    rt.addValue("Sqrt Mean B", Math.sqrt(stats_b.mean));
+                    rt.addValue("Sqrt Mean Blue", Math.sqrt(stats_b.mean));
                 }
+
+                if(doStdDeviationBlue){
+                    rt.addValue("StD Blue", stats_b.stdDev);
+                }
+
                 if(doAverageRGBcolors){
-                    rt.addValue("Sum Mean RGB", (stats_b.mean+stats_g.mean+stats_b.mean)/3);
+                    rt.addValue("Sum RGB Mean", (stats_b.mean+stats_g.mean+stats_b.mean)/3);
                 }
 
-                impPlusesHSB[0].setRoi(roi); //hue
-                impPlusesHSB[1].setRoi(roi); //saturation
-                impPlusesHSB[2].setRoi(roi); //brightness
+                impHSB[0].setRoi(roi); //hue
+                impHSB[1].setRoi(roi); //saturation
+                impHSB[2].setRoi(roi); //brightness
 
-                ImageStatistics stats_hu = impPlusesHSB[0].getAllStatistics();
-                ImageStatistics stats_sa = impPlusesHSB[1].getAllStatistics();
-                ImageStatistics stats_br = impPlusesHSB[2].getAllStatistics();
+                ImageStatistics stats_hu = impHSB[0].getAllStatistics();
+                ImageStatistics stats_sa = impHSB[1].getAllStatistics();
+                ImageStatistics stats_br = impHSB[2].getAllStatistics();
 
-                if(doMeanHue)rt.addValue("Mean H", stats_hu.mean);
-                if(doMeanSaturation)rt.addValue("Mean S", stats_sa.mean);
-                if(doMeanBrightness)rt.addValue("Mean B", stats_br.mean);
+                if(doMeanHue)
+                    rt.addValue("Mean Hue", stats_hu.mean);
+                if(doStdDeviationHue)
+                    rt.addValue("StD Hue", stats_hu.stdDev);
 
-                if(doStdDeviationHue)rt.addValue("StD H", stats_hu.stdDev);
-                if(doStdDeviationS)rt.addValue("StD S", stats_sa.stdDev);
-                if(doStdDeviationBr)rt.addValue("StD B", stats_br.stdDev);
+                if(doMeanSaturation)
+                    rt.addValue("Mean Sat", stats_sa.mean);
+                if(doStdDeviationS)
+                    rt.addValue("StD Sat", stats_sa.stdDev);
+
+                if(doMeanBrightness)
+                    rt.addValue("Mean Bri", stats_br.mean);
+                if(doStdDeviationBr)
+                    rt.addValue("StD Bri", stats_br.stdDev);
             }
         }
 
@@ -875,10 +966,13 @@ public class Seeds_Analysis implements PlugIn
         {
             if (p == null) return Double.NaN;
             double cperimeter = 0.0;
+            int firstPoint = 0;
+            int lastPoint = p.npoints - 1;
 
             for (int i = 0; i <= p.npoints - 2; i++) {
                 cperimeter += distance(p.xpoints[i+1], p.ypoints[i+1], p.xpoints[i], p.ypoints[i]);
             }
+            cperimeter += distance(p.xpoints[lastPoint], p.ypoints[lastPoint], p.xpoints[firstPoint], p.ypoints[firstPoint]);
 
             return cperimeter;
         }
@@ -1188,7 +1282,7 @@ public class Seeds_Analysis implements PlugIn
       boolean doInertia = true;
       boolean doCorrelation = true;
 
-      protected ImagePlus completeImagePlus;
+      //protected ImagePlus completeImagePlus;
       protected ImageProcessor ip;
       protected Roi currentRoi;
 
@@ -1205,11 +1299,10 @@ public class Seeds_Analysis implements PlugIn
       protected double correlation=0.0;
       protected double sum = 0.0;
 
-
       public int setup(String arg, ImagePlus imp)
       {
-        if (imp != null)
-        return DONE;
+        if(imp != null)
+            return DONE;
 
         return DOES_8G+DOES_STACKS+SUPPORTS_MASKING;
       }
@@ -1221,7 +1314,7 @@ public class Seeds_Analysis implements PlugIn
 
       public GLCM(ImagePlus i)
       {
-        completeImagePlus = i;
+        //completeImagePlus = i;
         ip = i.getProcessor();
       }
 
@@ -1637,7 +1730,5 @@ public class Seeds_Analysis implements PlugIn
           }
         }
       }
-
     }
-
 }

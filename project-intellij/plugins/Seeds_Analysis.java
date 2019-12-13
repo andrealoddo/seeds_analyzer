@@ -272,63 +272,63 @@ public class Seeds_Analysis implements PlugIn
             states[1] = false;
             labels[2] = "Feret's diameter    ";
             states[2] = false;
-            labels[3] = "Convex Area*           ";
+            labels[3] = "Convex Area           ";
             states[3] = false;
-            labels[4] = "Convex Perimeter*     ";
+            labels[4] = "Convex Perimeter     ";
             states[4] = false;
-            labels[5] = "ArEquivD*             ";
+            labels[5] = "ArEquivD             ";
             states[5] = false;
-            labels[6] = "AspRatio*              ";
+            labels[6] = "AspRatio              ";
             states[6] = false;
-            labels[7] = "PerEquivD*            ";
+            labels[7] = "PerEquivD            ";
             states[7] = false;
-            labels[8] = "MinR and MaxR*        ";
+            labels[8] = "MinR and MaxR        ";
             states[8] = false;
-            labels[9] = "Roundness*            ";
+            labels[9] = "Roundness            ";
             states[9] = false;
-            labels[10] = "EquivEllAr*           ";
+            labels[10] = "EquivEllAr           ";
             states[10] = false;
-            labels[11] = "Compactness*          ";
+            labels[11] = "Compactness          ";
             states[11] = false;
-            labels[12] = "Solidity*             ";
+            labels[12] = "Solidity             ";
             states[12] = false;
-            labels[13] = "ThinnessR*           ";
+            labels[13] = "ThinnessR           ";
             states[13] = false;
-            labels[14] = "RFactor*             ";
+            labels[14] = "RFactor             ";
             states[14] = false;
-            labels[15] = "Convexity*             ";
+            labels[15] = "Convexity             ";
             states[15] = false;
-            labels[16] = "Concavity*              ";
+            labels[16] = "Concavity              ";
             states[16] = false;
-            labels[17] = "ArBBox*                ";
+            labels[17] = "ArBBox                ";
             states[17] = false;
-            labels[18] = "Rectang*               ";
+            labels[18] = "Rectang               ";
             states[18] = false;
-            labels[19] = "ModRatio*              ";
+            labels[19] = "ModRatio              ";
             states[19] = false;
-            labels[20] = "Sphericity*            ";
+            labels[20] = "Sphericity            ";
             states[20] = false;
-            labels[21] = "Elongation*            ";
+            labels[21] = "Elongation            ";
             states[21] = false;
-            labels[22] = "NormPeriIndex*         ";
+            labels[22] = "NormPeriIndex         ";
             states[22] = false;
-            labels[23] = "HaralickRatio*         ";
+            labels[23] = "HaralickRatio         ";
             states[23] = false;
-            labels[24] = "Bending Energy*        ";
+            labels[24] = "Bending Energy        ";
             states[24] = false;
-            labels[25] = "DS**        ";
+            labels[25] = "DS        ";
             states[25] = false;
-            labels[26] = "Jaggedness**       ";
+            labels[26] = "Jaggedness       ";
             states[26] = false;
-            labels[27] = "Endocarp**              ";
+            labels[27] = "Endocarp              ";
             states[27] = false;
-            labels[28] = "Breadth**               ";
+            labels[28] = "Breadth               ";
             states[28] = false;
-            labels[29] = "AvgRadius**            ";
+            labels[29] = "AvgRadius            ";
             states[29] = false;
-            labels[30] = "VarianceRadius**        ";
+            labels[30] = "VarianceRadius        ";
             states[30] = false;
-            labels[31] = "Circularity**           ";
+            labels[31] = "Circularity           ";
             states[31] = false;
         }
 
@@ -348,55 +348,55 @@ public class Seeds_Analysis implements PlugIn
             statesG[5] = false;
             labelsG[6] = "Kurtosis                  ";
             statesG[6] = false;
-            labelsG[7] = "Intensity Sum*            ";
+            labelsG[7] = "Intensity Sum            ";
             statesG[7] = false;
-            labelsG[8] = "SqI sum*                  ";
+            labelsG[8] = "SqI sum                  ";
             statesG[8] = false;
-            labelsG[9] = "Uniformity*               ";
+            labelsG[9] = "Uniformity               ";
             statesG[9] = false;
-            labelsG[10] = "Entropy*                 ";
+            labelsG[10] = "Entropy                 ";
             statesG[10] = false;
-            labelsG[11] = "Variance*                ";
+            labelsG[11] = "Variance                ";
             statesG[11] = false;
-            labelsG[12] = "Smoothness R*            ";
+            labelsG[12] = "Smoothness R            ";
             statesG[12] = false;
-            labelsG[13] = "GLCM                ";
+            labelsG[13] = "Haralick                ";
             statesG[13] = false;
         }
 
         private void setRGB(String[] labelsRGB, boolean[] statesRGB)
         {
-            labelsRGB[0] = "Mean R                      ";
+            labelsRGB[0] = "Mean Red                    ";
             statesRGB[0] = false;
-            labelsRGB[1] = "StD R                       ";
+            labelsRGB[1] = "StD Red                     ";
             statesRGB[1] = false;
-            labelsRGB[2] = "Sqrt Mean R                 ";
+            labelsRGB[2] = "Sqrt Mean Red               ";
             statesRGB[2] = false;
-            labelsRGB[3] = "Mean G                      ";
+            labelsRGB[3] = "Mean Green                  ";
             statesRGB[3] = false;
-            labelsRGB[4] = "StD G                       ";
+            labelsRGB[4] = "StD Green                   ";
             statesRGB[4] = false;
-            labelsRGB[5] = "Sqrt Mean G                 ";
+            labelsRGB[5] = "Sqrt Mean Green             ";
             statesRGB[5] = false;
-            labelsRGB[6] = "Mean B                      ";
+            labelsRGB[6] = "Mean Blue                   ";
             statesRGB[6] = false;
-            labelsRGB[7] = "StD B                       ";
+            labelsRGB[7] = "StD Blue                    ";
             statesRGB[7] = false;
-            labelsRGB[8] = "Sqrt Mean B                 ";
+            labelsRGB[8] = "Sqrt Mean Blue              ";
             statesRGB[8] = false;
             labelsRGB[9] = "Sum Mean RGB                ";
             statesRGB[9] = false;
-            labelsRGB[10] = "Mean H                     ";
+            labelsRGB[10] = "Mean Hue                   ";
             statesRGB[10] = false;
-            labelsRGB[11] = "StD H                      ";
+            labelsRGB[11] = "StD Hue                    ";
             statesRGB[11] = false;
-            labelsRGB[12] = "Mean S                     ";
+            labelsRGB[12] = "Mean Sat                   ";
             statesRGB[12] = false;
-            labelsRGB[13] = "StD S                      ";
+            labelsRGB[13] = "StD Sat                    ";
             statesRGB[13] = false;
-            labelsRGB[14] = "Mean B                     ";
+            labelsRGB[14] = "Mean Bri                   ";
             statesRGB[14] = false;
-            labelsRGB[15] = "StD B                      ";
+            labelsRGB[15] = "StD Bri                    ";
             statesRGB[15] = false;
         }
         /* Metodo della creazione della finestra di dialogo, visualizzazione del:
@@ -793,8 +793,8 @@ public class Seeds_Analysis implements PlugIn
             /* Grey */
             if(doMinandMax)
             {
-                rt.addValue("MinTest", stats.min);
-                rt.addValue("MaxTest", stats.max);
+                rt.addValue("Min", stats.min);
+                rt.addValue("Max", stats.max);
             }
 
             if(doMean)
@@ -809,7 +809,7 @@ public class Seeds_Analysis implements PlugIn
 
             if(doMedian)
             {
-                rt.addValue("MedianTest", stats.median);
+                rt.addValue("Median", stats.median);
             }
 
             if(doMode)
@@ -819,12 +819,12 @@ public class Seeds_Analysis implements PlugIn
 
             if(doSkewness)
             {
-                rt.addValue("SkewnessTest", stats.skewness);
+                rt.addValue("Skewness", stats.skewness);
             }
 
             if(doKurtois)
             {
-                rt.addValue("KurtosisTest", stats.kurtosis);
+                rt.addValue("Kurtosis", stats.kurtosis);
             }
 
             if(doIntensitySum)
@@ -863,17 +863,18 @@ public class Seeds_Analysis implements PlugIn
             if(doGLCM)
             {
               glcm.exec(roi);
-              rt.addValue("GLCM-ASM", glcm.getASM());
-              rt.addValue("GLCM-IDM", glcm.getIDM());
               rt.addValue("GLCM-Contrast", glcm.getContrast());
+              rt.addValue("GLCM-Correlation", glcm.getCorrelation());
               rt.addValue("GLCM-Energy", glcm.getEnergy());
-              rt.addValue("GLCM-Entropy", glcm.getEntropy());
               rt.addValue("GLCM-Homogeneity", glcm.getHomogeneity());
-              rt.addValue("GLCM-Variance", glcm.getVariance());
-              rt.addValue("GLCM-Shade   ", glcm.getShade());
-              rt.addValue("GLCM-Prominence", glcm.getProminence());
-              rt.addValue("GLCM-Inertia", glcm.getInertia());
-              rt.addValue("GLCM-Corr", glcm.getCorrelation());
+
+              //rt.addValue("GLCM-ASM", glcm.getASM());
+              //rt.addValue("GLCM-Entropy", glcm.getEntropy());
+              //rt.addValue("GLCM-IDM", glcm.getIDM());
+              //rt.addValue("GLCM-Inertia", glcm.getInertia());
+              //rt.addValue("GLCM-Prominence", glcm.getProminence());
+              //rt.addValue("GLCM-Shade   ", glcm.getShade());
+              //rt.addValue("GLCM-Variance", glcm.getVariance());
             }
 
             if(typeRGB)
@@ -1270,33 +1271,33 @@ public class Seeds_Analysis implements PlugIn
       int phi = 0;
       boolean symmetry = true;
 
-      boolean doASM = true;
-      boolean doIDM = true;
+      //boolean doASM = true;
+      //boolean doIDM = true;
+      //boolean doEntropy = true;
+      //boolean doInertia = true;
+      //boolean doShade = true;
+      //boolean doProminence = true;
+      //boolean doVariance = true;
       boolean doContrast = true;
-      boolean doEnergy = true;
-      boolean doEntropy = true;
-      boolean doHomogeneity = true;
-      boolean doVariance = true;
-      boolean doShade = true;
-      boolean doProminence = true;
-      boolean doInertia = true;
       boolean doCorrelation = true;
+      boolean doEnergy = true;
+      boolean doHomogeneity = true;
 
-      //protected ImagePlus completeImagePlus;
       protected ImageProcessor ip;
       protected Roi currentRoi;
 
-      protected double asm = 0.0;
-      protected double IDM = 0.0;
+      //protected double asm = 0.0;
+      //protected double IDM = 0.0;
+      //protected double entropy = 0.0;
+      //protected double inertia = 0.0;
+      //protected double prominence=0.0;
+      //protected double shade = 0.0;
+      //protected double variance = 0.0;
       protected double contrast = 0.0;
+      protected double correlation= 0.0;
       protected double energy = 0.0;
-      protected double entropy = 0.0;
       protected double homogeneity = 0.0;
-      protected double variance = 0.0;
-      protected double shade = 0.0;
-      protected double prominence=0.0;
-      protected double inertia = 0.0;
-      protected double correlation=0.0;
+
       protected double sum = 0.0;
 
       public int setup(String arg, ImagePlus imp)
@@ -1314,9 +1315,10 @@ public class Seeds_Analysis implements PlugIn
 
       public GLCM(ImagePlus i)
       {
-        //completeImagePlus = i;
         ip = i.getProcessor();
       }
+
+      /* Removed GLCM statistics functions
 
       public double getASM()
       {
@@ -1328,14 +1330,9 @@ public class Seeds_Analysis implements PlugIn
         return IDM;
       }
 
-      public double getContrast()
+      public double getInertia()
       {
-        return contrast;
-      }
-
-      public double getEnergy()
-      {
-        return energy;
+        return inertia;
       }
 
       public double getEntropy()
@@ -1343,14 +1340,9 @@ public class Seeds_Analysis implements PlugIn
         return entropy;
       }
 
-      public double getHomogeneity()
+      public double getProminence()
       {
-        return homogeneity;
-      }
-
-      public double getVariance()
-      {
-        return variance;
+        return prominence;
       }
 
       public double getShade()
@@ -1358,19 +1350,31 @@ public class Seeds_Analysis implements PlugIn
         return shade;
       }
 
-      public double getProminence()
+      public double getVariance()
       {
-        return prominence;
+        return variance;
       }
 
-      public double getInertia()
+      */
+
+      public double getContrast()
       {
-        return inertia;
+        return contrast;
       }
 
       public double getCorrelation()
       {
         return correlation;
+      }
+
+      public double getEnergy()
+      {
+        return energy;
+      }
+
+      public double getHomogeneity()
+      {
+        return homogeneity;
       }
 
       public double getSum()
@@ -1407,7 +1411,7 @@ public class Seeds_Analysis implements PlugIn
 
         int offsetX = 1;
         int offsetY = 0;
-        double [][] glcm = new double [256][256];
+        double[][] glcm = new double [256][256];
 
         // set our offsets based on the selected angle
         if(phi == 0)
@@ -1495,12 +1499,12 @@ public class Seeds_Analysis implements PlugIn
 
         //=====================================================================================================
         // calculate meanx, meany, stdevx and stdevy for the glcm
-        double[] px = new double [256];
-        double[] py = new double [256];
-        double meanx=0.0;
-        double meany=0.0;
-        double stdevx=0.0;
-        double stdevy=0.0;
+        double[] px = new double[256];
+        double[] py = new double[256];
+        double meanx = 0.0;
+        double meany = 0.0;
+        double stdevx = 0.0;
+        double stdevy = 0.0;
 
         // Px(i) and Py(j) are the marginal-probability matrix; sum rows (px) or columns (py)
         // First, initialize the arrays to 0
@@ -1515,16 +1519,16 @@ public class Seeds_Analysis implements PlugIn
         {
           for (int j=0; j<256; j++)
           {
-            px[i] += glcm [i][j];
+            px[i] += glcm[i][j];
           }
         }
 
         // sum the glcm rows to Py(j)
-        for (int j=0;  j<256; j++)
+        for (int j=0; j<256; j++)
         {
           for (int i=0; i<256; i++)
           {
-            py[j] += glcm [i][j];
+            py[j] += glcm[i][j];
           }
         }
 
@@ -1543,6 +1547,8 @@ public class Seeds_Analysis implements PlugIn
         }
 
         //=====================================================================================================
+        /* Disabled GLCM statistics functions
+
         // calculate the angular second moment (asm)
 
         if(doASM == true)
@@ -1557,53 +1563,7 @@ public class Seeds_Analysis implements PlugIn
           }
         }
 
-        // calculate the inverse difference moment (idm) (Walker, et al. 1995)
-        // this is calculated using the same formula as Conners, et al., 1984 "Local Homogeneity"
-
-        if(doIDM == true)
-        {
-          IDM = 0.0;
-          for (int i=0; i<256; i++)
-          {
-            for (int j=0; j<256; j++)
-            {
-              IDM += ((1/(1+(Math.pow(i-j,2))))*glcm[i][j]);
-            }
-          }
-        }
-
-        // calculate the contrast (Haralick, et al. 1973)
-        // similar to the inertia, except abs(i-j) is used
-
-        if(doContrast == true)
-        {
-          contrast = 0.0;
-          for (int i=0; i<256; i++)
-          {
-            for (int j=0; j<256; j++)
-            {
-              contrast += Math.pow(Math.abs(i-j),2)*(glcm[i][j]);
-            }
-          }
-
-        }
-
-        // calculate the energy
-
-        if(doEnergy == true)
-        {
-          energy = 0.0;
-          for (int i=0; i<256; i++)
-          {
-            for (int j=0; j<256; j++)
-            {
-              energy += Math.pow(glcm[i][j],2);
-            }
-          }
-        }
-
         // calculate the entropy (Haralick et al., 1973; Walker, et al., 1995)
-
         if(doEntropy == true)
         {
           entropy = 0.0;
@@ -1622,35 +1582,40 @@ public class Seeds_Analysis implements PlugIn
           }
         }
 
-        // calculate the homogeneity (Parker)
-        // "Local Homogeneity" from Conners, et al., 1984 is calculated the same as IDM above
-        // Parker's implementation is below; absolute value of i-j is taken rather than square
-
-        if(doHomogeneity == true)
+        // calculate the inverse difference moment (idm) (Walker, et al. 1995)
+        // this is calculated using the same formula as Conners, et al., 1984 "Local Homogeneity"
+        if(doIDM == true)
         {
-          homogeneity = 0.0;
-          for(int i=0; i<256; i++)
+          IDM = 0.0;
+          for (int i=0; i<256; i++)
           {
-            for(int j=0; j<256; j++)
+            for (int j=0; j<256; j++)
             {
-              homogeneity += glcm[i][j]/(1.0+Math.abs(i-j));
+              IDM += ((1/(1+(Math.pow(i-j,2))))*glcm[i][j]);
             }
           }
         }
 
-        // calculate the variance ("variance" in Walker 1995; "Sum of Squares: Variance" in Haralick 1973)
-
-        if(doVariance == true)
+        // calculate the inertia (Walker, et al., 1995; Connors, et al. 1984)
+        if (doInertia == true)
         {
-          variance = 0.0;
-          double mean = 0.0;
+          inertia = 0.0;
+          for (int i=0; i<256; i++)  {
+            for (int j=0; j<256; j++) {
+              if (glcm[i][j] != 0) {
+                inertia += (Math.pow((i-j),2)*glcm[i][j]);
+              }
+            }
+          }
+        }
 
-          mean = (meanx + meany)/2;
-          for(int i=0;  i<256; i++)
-          {
-            for(int j=0; j<256; j++)
-            {
-              variance += (Math.pow((i-mean),2)*glcm[i][j]);
+        // calculate the prominence (Walker, et al., 1995; Connors, et al. 1984)
+        if(doProminence == true)
+        {
+          prominence = 0.0;
+          for (int i=0;  i<256; i++) {
+            for (int j=0; j<256; j++) {
+              prominence += (Math.pow((i+j-meanx-meany),4)*glcm[i][j]);
             }
           }
         }
@@ -1668,54 +1633,196 @@ public class Seeds_Analysis implements PlugIn
             }
           }
         }
-        // calculate the prominence (Walker, et al., 1995; Connors, et al. 1984)
 
-        if(doProminence == true)
+        // calculate the variance ("variance" in Walker 1995; "Sum of Squares: Variance" in Haralick 1973)
+        if(doVariance == true)
         {
-          prominence = 0.0;
-          for (int i=0;  i<256; i++) {
-            for (int j=0; j<256; j++) {
-              prominence += (Math.pow((i+j-meanx-meany),4)*glcm[i][j]);
+          variance = 0.0;
+          double mean = 0.0;
+
+          mean = (meanx + meany)/2;
+          for(int i=0;  i<256; i++)
+          {
+            for(int j=0; j<256; j++)
+            {
+              variance += (Math.pow((i-mean),2))*glcm[i][j];
             }
           }
         }
+        */
 
-        //===============================================================================================
-        // calculate the inertia (Walker, et al., 1995; Connors, et al. 1984)
+        // calculate the contrast (Haralick, et al. 1973)
+        // similar to the inertia, except abs(i-j) is used
 
-        if (doInertia == true)
+        if(doContrast == true)
         {
-          inertia = 0.0;
-          for (int i=0; i<256; i++)  {
-            for (int j=0; j<256; j++) {
-              if (glcm[i][j] != 0) {
-                inertia += (Math.pow((i-j),2)*glcm[i][j]);
-              }
+          contrast = 0.0;
+          for (int i=0; i<256; i++)
+          {
+            for (int j=0; j<256; j++)
+            {
+              contrast += Math.pow(Math.abs(i-j),2)*(glcm[i][j]);
             }
           }
         }
-
 
         // calculate the correlation
         // methods based on Haralick 1973 (and MatLab), Walker 1995 are included below
         // Haralick/Matlab result reported for correlation currently; will give Walker as an option in the future
-
-        if(doCorrelation == true)
+        if(doCorrelation == true && 0 == 1)
         {
           correlation = 0.0;
           // calculate the correlation parameter
-          for (int i=0;  i<256; i++) {
-            for (int j=0; j<256; j++) {
+          for (int i=0;  i<256; i++)
+          {
+            for (int j=0; j<256; j++)
+            {
               //Walker, et al. 1995 (matches Xite)
               //correlation += ((((i-meanx)*(j-meany))/Math.sqrt(stdevx*stdevy))*glcm[i][j]);
               //Haralick, et al. 1973 (continued below outside loop; matches original GLCM_Texture)
               //correlation += (i*j)*glcm[i][j];
               //matlab's rephrasing of Haralick 1973; produces the same result as Haralick 1973
-              correlation += ((((i-meanx)*(j-meany))/( stdevx*stdevy))*glcm[i][j]);
+              correlation += ( ( ( (i-meanx)*(j-meany) )/( stdevx*stdevy ) )*glcm[i][j] );
             }
           }
           //Haralick, et al. 1973, original method continued.
           //correlation = (correlation -(meanx*meany))/(stdevx*stdevy);
+        }
+
+        // Correlation test version 2
+        if(doCorrelation == true)
+        {
+            correlation = 0.0;
+            int rowN = 256;
+            int colN = 256;
+            int n_terms = rowN*colN;
+            double[] r1 = new double[n_terms];
+            double[] c = new double[n_terms];
+            double[] vertGLCM = new double[n_terms];
+            double[] mr = new double[n_terms];
+            double[] term1 = new double[n_terms];
+            double[] mc = new double[n_terms];
+            int val = 0;
+            int n = 0;
+            double sum_mr = 0.0;
+            double sr = 0.0;
+            double sum_mc = 0.0;
+            double sc = 0;
+            double term2 = 0.0;
+
+
+            for(int k=0; k<rowN*colN; k+=rowN)
+            {
+                for(int i=0; i<rowN; i++)
+                {
+                    r1[i+k] = i;
+                }
+            }
+
+            for(int k=0; k<rowN*colN; k+=rowN)
+            {
+                for(int i=0; i<colN; i++)
+                {
+                    c[i+k] = val;
+                }
+                val++;
+            }
+
+            for(int rr=0; rr<rowN; rr++)
+            {
+                for(int cc=0; cc<colN; cc++)
+                {
+                    vertGLCM[n] = glcm[rr][cc];
+                    n++;
+                }
+            }
+
+            for(int i=0; i<rowN*colN; i++)
+            {
+                mr[i] = r1[i]*vertGLCM[i];
+            }
+
+
+            for(int i=0; i<rowN*colN; i++)
+            {
+                sum_mr = sum_mr + mr[i];
+            }
+
+            for(int i=0; i<rowN*colN; i++)
+            {
+                term1[i] = (r1[i] - sum_mr) * (r1[i] - sum_mr) * vertGLCM[i];
+            }
+
+            for(int i=0; i<rowN*colN; i++)
+            {
+                sr = sr + term1[i];
+            }
+            sr = Math.sqrt(sr);
+
+            for(int i=0; i<rowN*colN; i++)
+            {
+                mc[i] = c[i] * vertGLCM[i];
+            }
+
+            for(int i=0; i<rowN*colN; i++)
+            {
+                sum_mc = sum_mc + mc[i];
+            }
+
+            for(int i=0; i<rowN*colN; i++)
+            {
+                term1[i] = (c[i] - sum_mc) * (c[i] - sum_mc) * vertGLCM[i];
+            }
+
+            for(int i=0; i<rowN*colN; i++)
+            {
+                sc = sc + term1[i];
+            }
+            sc = Math.sqrt(sc);
+
+            for(int i=0; i<rowN*colN; i++)
+            {
+                term1[i] =  (r1[i] - sum_mr) * (c[i] - sum_mc) * vertGLCM[i];
+            }
+
+            for(int i=0; i<rowN*colN; i++)
+            {
+                term2 = term2 + term1[i];
+            }
+
+            correlation = term2 / (sr * sc);
+
+
+
+
+        }
+
+        // calculate the energy
+        if(doEnergy == true)
+        {
+          energy = 0.0;
+          for (int i=0; i<256; i++)
+          {
+            for (int j=0; j<256; j++)
+            {
+              energy += Math.pow(glcm[i][j], 2);
+            }
+          }
+        }
+
+        // calculate the homogeneity (Parker)
+        // "Local Homogeneity" from Conners, et al., 1984 is calculated the same as IDM above
+        // Parker's implementation is below; absolute value of i-j is taken rather than square
+        if(doHomogeneity == true)
+        {
+          homogeneity = 0.0;
+          for(int i=0; i<256; i++)
+          {
+            for(int j=0; j<256; j++)
+            {
+              homogeneity += glcm[i][j]/(1.0+Math.abs(i - j));
+            }
+          }
         }
 
         //===============================================================================================

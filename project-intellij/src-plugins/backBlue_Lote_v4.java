@@ -20,10 +20,10 @@ import ij.process.ImageProcessor;
 import ij.text.TextWindow;
 
 /**
- * Teste de segmentação em lote (blue background) - v06112019
+ * Teste de segmentaï¿½ï¿½o em lote (blue background) - v06112019
  * Alessandra Mendes
  * Sem Watersheed - 31/10/2019
- * Deve existir uma pasta c:\Results para armazenamento dos aquivos de saída
+ * Deve existir uma pasta c:\Results para armazenamento dos aquivos de saï¿½da
 **/
 public class backBlue_Lote_v4 implements PlugIn {
 
@@ -34,10 +34,10 @@ public class backBlue_Lote_v4 implements PlugIn {
 		String directory, fileName;
 		List<String> result;
 		int k, qtd = 0;
-		
+
 		OpenDialog od = new OpenDialog("Selezionare un file tra quelli da analizzare", null);
 		directory = od.getDirectory();
-		if (null == directory) 
+		if (null == directory)
 			return;
 		try {
 			Stream<Path> walk = Files.walk(Paths.get(directory));
@@ -46,7 +46,7 @@ public class backBlue_Lote_v4 implements PlugIn {
 			walk.close();
 
 			qtd = result.size();
-			
+
 			ImagePlus imp;
 			ImagePlus impColor[] = new ImagePlus[qtd];
 			ImagePlus impGray[] = new ImagePlus[qtd];
@@ -54,53 +54,53 @@ public class backBlue_Lote_v4 implements PlugIn {
 			String fileNames[] = new String[qtd];
 			ImageProcessor ipColor, ipGray;
 			ColorProcessor cpRGB;
-			
+
 			int lin, col, i, j;
 			float maior = 0, min, max, hue = 0, sat = 0, bri = 0;
 			int[] RGB = new int[3];
 			int[] GRAY = new int[3];
 			float hsb[] = new float[3];
 			int R = 0, G = 1, B = 2; // index
-			
+
 			for (k=0; k<qtd; k++) {
 
 				//nome do arquivo
 				fileName = (result.get(k).substring(result.get(k).lastIndexOf("\\") + 1));
 	            fileName = (fileName.substring(0, fileName.indexOf(".")));
 	            fileNames[k] = fileName;
-	            
+
 	            // BACK_BLUE
 				IJ.open(result.get(k));
-				imp = (ImagePlus) IJ.getImage(); 
+				imp = (ImagePlus) IJ.getImage();
 				impColor[k] = (ImagePlus) imp.clone();
 				ipColor = imp.getProcessor();
-				col = ipColor.getWidth(); 
-				lin = ipColor.getHeight(); 
+				col = ipColor.getWidth();
+				lin = ipColor.getHeight();
 				IJ.run("8-bit");
 				impGray[k] = new Duplicator().run(imp);
 				ipGray = imp.getProcessor();
 
 				// flag - red edges
 				ipGray.findEdges();
-				for (j=0; j<col; j++) { 
-					for (i=0; i<lin; i++) { 
+				for (j=0; j<col; j++) {
+					for (i=0; i<lin; i++) {
 						ipGray.getPixel(j, i, GRAY);
 						ipColor.getPixel(j, i, RGB);
-						if(GRAY[0]>100){ 
+						if(GRAY[0]>100){
 							RGB[R] = 255;
 							RGB[G] = 0;
 							RGB[B] = 0;
-							ipColor.putPixel(j, i, RGB); 
+							ipColor.putPixel(j, i, RGB);
 						}
 					}
 				}
-				
+
 				// background extraction
 				cpRGB = (ColorProcessor) ipColor;
-				
-				for (j=0; j<col; j++) { 
-					for (i=0; i<lin; i++) { 
-						cpRGB.getPixel(j, i, RGB); 
+
+				for (j=0; j<col; j++) {
+					for (i=0; i<lin; i++) {
+						cpRGB.getPixel(j, i, RGB);
 						//Color HUE (model HLS);
 						Color.RGBtoHSB(RGB[R], RGB[G], RGB[B], hsb);
 						sat = (int) Math.ceil(hsb[1]*100);
@@ -119,25 +119,25 @@ public class backBlue_Lote_v4 implements PlugIn {
 							hue = (60 * (RGB[R] - RGB[G]) / (max - min)) + 240;
 						//valor fixo "10" - automatizar...
 						if( ( ((RGB[B]>RGB[G])&&(RGB[B]>RGB[R]))
-								&&( (RGB[B]-RGB[R])>10) ) // se o canal azul é o mais alto e a distância entre o canal azul e os demais é de pelo menos 10 intensidades
-								&&( ((hue >= 181)&&(hue <= 300)) //se o tom é de azul (do ciano ao azul marinho)
-								&&((sat>=20)&&(bri>=20) ) ) ){ // se (saturação >= 20% e brilho >= 20%)
-							ipGray.putPixel(j, i, 255); 
+								&&( (RGB[B]-RGB[R])>10) ) // se o canal azul ï¿½ o mais alto e a distï¿½ncia entre o canal azul e os demais ï¿½ de pelo menos 10 intensidades
+								&&( ((hue >= 181)&&(hue <= 300)) //se o tom ï¿½ de azul (do ciano ao azul marinho)
+								&&((sat>=20)&&(bri>=20) ) ) ){ // se (saturaï¿½ï¿½o >= 20% e brilho >= 20%)
+							ipGray.putPixel(j, i, 255);
 						}else {
-							ipGray.putPixel(j, i, 0); 
+							ipGray.putPixel(j, i, 0);
 						}
 					}
-				} 
+				}
 
-				imp.updateAndDraw(); 
-				ipColor.setAutoThreshold("Otsu"); 
-				IJ.run("Convert to Mask"); 
-				IJ.run("Make Binary"); 
-				IJ.run("Fill Holes"); 
-				IJ.run("Set Measurements...", "area"); 
-		 		IJ.run("Analyze Particles...", "size=0-Infinity show=Nothing display");  
-		 		TextWindow tw = (TextWindow)WindowManager.getFrame("Results"); 
-			    ResultsTable rt = tw.getTextPanel().getResultsTable(); 
+				imp.updateAndDraw();
+				ipColor.setAutoThreshold("Otsu");
+				IJ.run("Convert to Mask");
+				IJ.run("Make Binary");
+				IJ.run("Fill Holes");
+				IJ.run("Set Measurements...", "area");
+		 		IJ.run("Analyze Particles...", "size=0-Infinity show=Nothing display");
+		 		TextWindow tw = (TextWindow)WindowManager.getFrame("Results");
+			    ResultsTable rt = tw.getTextPanel().getResultsTable();
 			    float areasMedia[] = rt.getColumn(0);
 			    maior = 0;
 			    for (i=0; i<areasMedia.length; i++)
@@ -148,22 +148,22 @@ public class backBlue_Lote_v4 implements PlugIn {
 
 				imp = IJ.getImage();
 				impSegm[k] = new Duplicator().run(imp);
-				
+
 				// fechando as janelas abertas
 				IJ.getImage().changes = false;
 				IJ.getImage().close();
 				IJ.getImage().changes = false;
 				IJ.getImage().close();
-				
+
 			
-			}				
-			
+			}
+
 			// Arrays - Output
 			for (k=0; k<qtd; k++) {
 				IJ.saveAs(impColor[k], "Jpeg", "\\Results\\"+fileNames[k]+"_C"); // Original color images
 				IJ.saveAs(impGray[k], "Jpeg", "\\Results\\"+fileNames[k]+"_G");  // Gray scale images
 				IJ.saveAs(impSegm[k], "Jpeg", "\\Results\\"+fileNames[k]+"_S");  //Segmentation images (masks)
-			}		
+			}
 
 /**		OUTPUT ARRAYS
 *		colorRGBImageOutputArray = impSegm[]
@@ -173,12 +173,12 @@ public class backBlue_Lote_v4 implements PlugIn {
 
 *
 */
-			TextWindow tw = (TextWindow)WindowManager.getFrame("Summary"); 
+			TextWindow tw = (TextWindow)WindowManager.getFrame("Summary");
 			tw.close(false); //sair sem salvar
 			IJ.showMessage("End of the plugin");
 
 		} catch (IOException e) {
 			e.printStackTrace();
-		}		
+		}
    }
 }

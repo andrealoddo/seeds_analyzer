@@ -1523,7 +1523,7 @@ public class Seeds_Analysis implements PlugIn
           }
         }
 
-        // sum the glcm rows to Py(j)
+        // sum the glcm columns to Py(j)
         for (int j=0; j<256; j++)
         {
           for (int i=0; i<256; i++)
@@ -1666,32 +1666,24 @@ public class Seeds_Analysis implements PlugIn
           }
         }
 
-        // calculate the correlation
-        // methods based on Haralick 1973 (and MatLab), Walker 1995 are included below
-        // Haralick/Matlab result reported for correlation currently; will give Walker as an option in the future
-        if(doCorrelation == true && 0 == 1)
+        if(doCorrelation == true)
         {
           correlation = 0.0;
-          // calculate the correlation parameter
+
           for (int i=0;  i<256; i++)
           {
             for (int j=0; j<256; j++)
             {
-              //Walker, et al. 1995 (matches Xite)
-              //correlation += ((((i-meanx)*(j-meany))/Math.sqrt(stdevx*stdevy))*glcm[i][j]);
-              //Haralick, et al. 1973 (continued below outside loop; matches original GLCM_Texture)
-              //correlation += (i*j)*glcm[i][j];
-              //matlab's rephrasing of Haralick 1973; produces the same result as Haralick 1973
-              correlation += ( ( ( (i-meanx)*(j-meany) )/( stdevx*stdevy ) )*glcm[i][j] );
+              //Walker, et al. 1995
+              correlation += ((((i-meanx)*(j-meany))/Math.sqrt(stdevx*stdevy))*glcm[i][j]);
             }
           }
-          //Haralick, et al. 1973, original method continued.
-          //correlation = (correlation -(meanx*meany))/(stdevx*stdevy);
         }
 
         // Correlation test version 2
-        if(doCorrelation == true)
+        if(doCorrelation == false)
         {
+            IJ.log("v2");
             correlation = 0.0;
             int rowN = 256;
             int colN = 256;

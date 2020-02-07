@@ -1,4 +1,3 @@
-
 import java.awt.Color;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,17 +19,18 @@ import ij.process.ImageProcessor;
 import ij.text.TextWindow;
 
 /**
- * Teste de segmenta��o em lote (blue background) - v06112019
+ * Teste de segmenta��o em lote (blue background) - v07012020
  * Alessandra Mendes
- * Sem Watersheed - 31/10/2019
- * Deve existir uma pasta c:\Results para armazenamento dos aquivos de sa�da
+ * Salvamento da m�scara em Tiff - 07/01/2020
+ * Na pasta de entrada s� devem existir imagens RGB com fundo azul - Todas ser�o processadas.
+ * Deve existir uma pasta de sa�da c:\Results para armazenamento dos aquivos de sa�da
 **/
-public class backBlue_Lote_v4 implements PlugIn {
+public class backBlue_Lote_v5 implements PlugIn {
 
 
 	public void run(String args) {
-
 		IJ.run("Close All");
+
 		String directory, fileName;
 		List<String> result;
 		int k, qtd = 0;
@@ -73,7 +73,7 @@ public class backBlue_Lote_v4 implements PlugIn {
 				IJ.open(result.get(k));
 				imp = (ImagePlus) IJ.getImage();
 				impColor[k] = (ImagePlus) imp.clone();
-				ipColor = imp.getProcessor();
+				ipColor = imp.getProcessor();		
 				col = ipColor.getWidth();
 				lin = ipColor.getHeight();
 				IJ.run("8-bit");
@@ -145,6 +145,7 @@ public class backBlue_Lote_v4 implements PlugIn {
 			    		maior = areasMedia[i];
 				tw.close(false); //sair sem salvar
 				IJ.run("Analyze Particles...", "size="+(maior/3)+"-Infinity show=Masks summarize");
+				IJ.run("Convert to Mask"); //convers�o para m�scara
 
 				imp = IJ.getImage();
 				impSegm[k] = new Duplicator().run(imp);
@@ -154,15 +155,13 @@ public class backBlue_Lote_v4 implements PlugIn {
 				IJ.getImage().close();
 				IJ.getImage().changes = false;
 				IJ.getImage().close();
-
-			
 			}
 
 			// Arrays - Output
 			for (k=0; k<qtd; k++) {
-				IJ.saveAs(impColor[k], "Jpeg", "\\Results\\"+fileNames[k]+"_C"); // Original color images
-				IJ.saveAs(impGray[k], "Jpeg", "\\Results\\"+fileNames[k]+"_G");  // Gray scale images
-				IJ.saveAs(impSegm[k], "Jpeg", "\\Results\\"+fileNames[k]+"_S");  //Segmentation images (masks)
+				IJ.saveAs(impColor[k], "Jpeg", directory + "\\Results\\" + fileNames[k] + "_C"); // Original color images
+				IJ.saveAs(impGray[k], "Jpeg", directory + "\\Results\\" + fileNames[k] + "_G");  // Gray scale images
+				IJ.saveAs(impSegm[k], "tiff", directory + "\\Results\\" + fileNames[k] + "_S");  //Segmentation images (masks TIFF)
 			}
 
 /**		OUTPUT ARRAYS

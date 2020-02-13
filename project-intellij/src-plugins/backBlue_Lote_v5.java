@@ -73,7 +73,7 @@ public class backBlue_Lote_v5 implements PlugIn {
 				IJ.open(result.get(k));
 				imp = (ImagePlus) IJ.getImage();
 				impColor[k] = (ImagePlus) imp.clone();
-				ipColor = imp.getProcessor();		
+				ipColor = imp.getProcessor();
 				col = ipColor.getWidth();
 				lin = ipColor.getHeight();
 				IJ.run("8-bit");
@@ -82,8 +82,8 @@ public class backBlue_Lote_v5 implements PlugIn {
 
 				// flag - red edges
 				ipGray.findEdges();
-				for (j=0; j<col; j++) {
-					for (i=0; i<lin; i++) {
+				for(j=0; j<col; j++) {
+					for(i=0; i<lin; i++) {
 						ipGray.getPixel(j, i, GRAY);
 						ipColor.getPixel(j, i, RGB);
 						if(GRAY[0]>100){
@@ -97,7 +97,6 @@ public class backBlue_Lote_v5 implements PlugIn {
 
 				// background extraction
 				cpRGB = (ColorProcessor) ipColor;
-
 				for (j=0; j<col; j++) {
 					for (i=0; i<lin; i++) {
 						cpRGB.getPixel(j, i, RGB);

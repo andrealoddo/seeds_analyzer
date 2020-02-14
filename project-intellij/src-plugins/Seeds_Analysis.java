@@ -1,28 +1,25 @@
-import ij.*;
-import ij.measure.*;
-import ij.plugin.*;
-import ij.plugin.filter.*;
-import ij.process.*;
-import ij.gui.*;
-import ij.plugin.filter.Analyzer;
-import ij.plugin.MeasurementsWriter;
-import ij.plugin.frame.ThresholdAdjuster;
+import ij.IJ;
+import ij.ImagePlus;
+import ij.ImageStack;
+import ij.Macro;
+import ij.gui.GenericDialog;
+import ij.gui.Roi;
+import ij.io.OpenDialog;
+import ij.measure.Calibration;
 import ij.plugin.ChannelSplitter;
-import ij.plugin.Thresholder;
-import java.lang.String;
-import java.awt.*;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.awt.Polygon;
-import java.lang.Object;
-import java.util.Arrays;
-import ij.io.Opener;
+import ij.plugin.Duplicator;
 import ij.plugin.ImageCalculator;
-import ij.IJ.*;
+import ij.plugin.PlugIn;
+import ij.plugin.filter.Analyzer;
+import ij.plugin.filter.ParticleAnalyzer;
 import ij.plugin.filter.PlugInFilter;
-import ij.text.*;
-import java.lang.*;
-import java.awt.Color;
+import ij.process.ColorProcessor;
+import ij.process.ImageProcessor;
+import ij.process.ImageStatistics;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,28 +27,15 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import ij.IJ;
-import ij.ImagePlus;
-import ij.WindowManager;
-import ij.io.OpenDialog;
-import ij.measure.ResultsTable;
-import ij.plugin.Duplicator;
-import ij.plugin.PlugIn;
-import ij.process.ColorProcessor;
-import ij.process.ImageProcessor;
-import ij.text.TextWindow;
-import ij.Prefs;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.InputEvent;
-import java.awt.Robot;
+import static java.lang.Thread.MIN_PRIORITY;
 
 /*
-* Seeds_Analysis e' una classe volta alla misurazione di elementi all'interno di una immagine (binaria+grey+RGB).
-* Si appoggia al Plugin "ThresholdAdjuster" per poter individuare le zone e gli oggetti da analizzare.
-* Implementa Plugin ma al suo interno vi e' una classe Cells_Analyzer che estende a sua volta il PlugInFilter "ParticleAnalyzer"
-* aggiungendo misure non presenti in quest'ultimo.
-*/
+ * Seeds_Analysis è una classe volta alla misurazione di elementi all'interno di una immagine (binaria+grey+RGB).
+ * Si appoggia al Plugin "ThresholdAdjuster" per poter individuare le zone e gli oggetti da analizzare.
+ * Implementa Plugin ma al suo interno vi è una classe Cells_Analyzer che estende a sua volta il PlugInFilter "ParticleAnalyzer"
+ * aggiungendo misure non presenti in quest'ultimo.
+ */
 public class Seeds_Analysis implements PlugIn
 {
 
@@ -60,12 +44,10 @@ public class Seeds_Analysis implements PlugIn
     protected ImagePlus imp;
     protected ImagePlus impColor;
     protected ImagePlus impGray;
-    protected ImagePlus impSegm;
-    protected ImagePlus impRGB[];
-    protected ImagePlus impHSB[];
-    protected ImageProcessor ip, ipColor, ipGray;
+    protected ImagePlus[] impRGB;
+    protected ImagePlus[] impHSB;
+    protected ImageProcessor ipColor, ipGray;
     protected ImageProcessor ipLightBackground, ipDarkBackground;
-    protected ImageCalculator ic;
     protected boolean typeGray, typeRGB;
     protected Cells_Analyzer cells_analyzer;
     protected GLCM glcm;
@@ -73,10 +55,10 @@ public class Seeds_Analysis implements PlugIn
 
     protected ColorProcessor cpRGB;
     protected int lin, col, i, j;
-    protected float maior = 0, min, max, hue = 0, sat = 0, bri = 0;
+    protected float min, max, hue = 0, sat = 0, bri = 0;
     protected int[] RGB = new int[3];
     protected int[] GRAY = new int[3];
-    protected float hsb[] = new float[3];
+    protected float[] hsb = new float[3];
     protected int R = 0, G = 1, B = 2;
 
     protected boolean measurementsAlreadySet = false;
@@ -106,7 +88,7 @@ public class Seeds_Analysis implements PlugIn
         {
             Stream<Path> walk = Files.walk(Paths.get(directory));
             result = walk.filter(Files::isRegularFile)
-            .map(x -> x.toString()).collect(Collectors.toList());
+                    .map(x -> x.toString()).collect(Collectors.toList());
             walk.close();
 
             qtd = result.size();
@@ -121,9 +103,9 @@ public class Seeds_Analysis implements PlugIn
                 fileName = (fileName.substring(0, fileName.indexOf(".")));
                 fileNames[k] = fileName;
 
-                // BACK_BLUE
+                // Blue background
                 IJ.open(result.get(k));
-                imp = (ImagePlus) IJ.getImage();
+                imp = IJ.getImage();
 
                 impColor = (ImagePlus) imp.clone();
                 ipColor = imp.getProcessor();
@@ -136,11 +118,14 @@ public class Seeds_Analysis implements PlugIn
 
                 // flag - red edges
                 ipGray.findEdges();
-                for (j=0; j<col; j++) {
-                    for (i=0; i<lin; i++) {
+                for(j=0; j<col; j++)
+                {
+                    for(i=0; i<lin; i++)
+                    {
                         ipGray.getPixel(j, i, GRAY);
                         ipColor.getPixel(j, i, RGB);
-                        if(GRAY[0]>100){
+                        if(GRAY[0]>100)
+                        {
                             RGB[R] = 255;
                             RGB[G] = 0;
                             RGB[B] = 0;
@@ -163,18 +148,18 @@ public class Seeds_Analysis implements PlugIn
                         max = Math.max(RGB[R], Math.max(RGB[G], RGB[B]));
                         // Calculate the Hue
                         if (max == min)
-                        hue = 0;
+                            hue = 0;
                         else if (max == RGB[R])
-                        hue = ((60 * (RGB[G] - RGB[B]) / (max - min)) + 360) % 360;
+                            hue = ((60 * (RGB[G] - RGB[B]) / (max - min)) + 360) % 360;
                         else if (max == RGB[G])
-                        hue = (60 * (RGB[B] - RGB[R]) / (max - min)) + 120;
+                            hue = (60 * (RGB[B] - RGB[R]) / (max - min)) + 120;
                         else if (max == RGB[B])
-                        hue = (60 * (RGB[R] - RGB[G]) / (max - min)) + 240;
+                            hue = (60 * (RGB[R] - RGB[G]) / (max - min)) + 240;
                         //valor fixo "10" - automatizar...
                         if( ( ((RGB[B]>RGB[G])&&(RGB[B]>RGB[R]))
-                        &&( (RGB[B]-RGB[R])>10) ) // se o canal azul � o mais alto e a dist�ncia entre o canal azul e os demais � de pelo menos 10 intensidades
-                        &&( ((hue >= 181)&&(hue <= 300)) //se o tom � de azul (do ciano ao azul marinho)
-                        &&((sat>=20)&&(bri>=20) ) ) )
+                                &&( (RGB[B]-RGB[R])>10) ) // se o canal azul � o mais alto e a dist�ncia entre o canal azul e os demais � de pelo menos 10 intensidades
+                                &&( ((hue >= 181)&&(hue <= 300)) //se o tom � de azul (do ciano ao azul marinho)
+                                &&((sat>=20)&&(bri>=20) ) ) )
                         { // se (satura��o >= 20% e brilho >= 20%)
                             ipGray.putPixel(j, i, 255);
                         }
@@ -184,7 +169,6 @@ public class Seeds_Analysis implements PlugIn
                     }
                 }
 
-                //imp.updateAndDraw();
                 ipColor.setAutoThreshold("Otsu");
                 IJ.run("Convert to Mask");
                 IJ.run("Make Binary");
@@ -193,8 +177,7 @@ public class Seeds_Analysis implements PlugIn
                 if(impColor.getType() == ImagePlus.COLOR_RGB)
                 {
                     typeRGB = true;
-                    ChannelSplitter ch = new ChannelSplitter();
-                    impRGB = ch.split(impColor);
+                    impRGB = ChannelSplitter.split(impColor);
                     impHSB = getImagePlusHSB(impColor);
 
                 }
@@ -247,12 +230,12 @@ public class Seeds_Analysis implements PlugIn
         {
             Stream<Path> walk = Files.walk(Paths.get(directory));
             result = walk.filter(Files::isRegularFile)
-            .map(x -> x.toString()).collect(Collectors.toList());
+                    .map(x -> x.toString()).collect(Collectors.toList());
             walk.close();
 
             qtd = result.size();
 
-            String fileNames[] = new String[qtd];
+            String[] fileNames = new String[qtd];
 
             for(k=0; k<qtd; k+=2)
             {
@@ -290,7 +273,7 @@ public class Seeds_Analysis implements PlugIn
                 col = ipColor.getWidth();
                 lin = ipColor.getHeight();
 
-                IJ.run("Close All");
+                //IJ.run("Close All");
                 imp.show();
 
                 IJ.run("8-bit");
@@ -303,6 +286,7 @@ public class Seeds_Analysis implements PlugIn
                 IJ.run("Make Binary");
                 IJ.run("Fill Holes");
 
+                // TODO aggiungere filtro regioni più piccole di un terzo della media delle regioni
                 int RGBValues[] = {0, 0, 0};
 /*
                 // background extraction
@@ -326,8 +310,7 @@ public class Seeds_Analysis implements PlugIn
                 if(impColor.getType() == ImagePlus.COLOR_RGB)
                 {
                     typeRGB = true;
-                    ChannelSplitter ch = new ChannelSplitter();
-                    impRGB = ch.split(impColor);
+                    impRGB = ChannelSplitter.split(impColor);
                     impHSB = getImagePlusHSB(impColor);
 
                 }
@@ -367,19 +350,18 @@ public class Seeds_Analysis implements PlugIn
     public void run(String arg)
     {
         handleInputImages();
-
     }
 
     /*
     The plugin can receive input in two different ways:
     1) 2 images, one with dark background and light background
-    2) 1 single RGB image with uniform bluebackground
+    2) 1 single RGB image with uniform blue background
     */
     public void handleInputImages()
     {
 
         // Input (blue or white/black backgrounds)
-        GenericDialog gd = new GenericDialog("Defaul settings");
+        GenericDialog gd = new GenericDialog("Default settings");
         String items[] = {"Select BLUE Background image", "Select WHITE and BLACK background images"};
         gd.addRadioButtonGroup("Input Images", items, 2, 1, "Blue Background");
         gd.showDialog();
@@ -438,8 +420,8 @@ public class Seeds_Analysis implements PlugIn
     }
 
     /* Inner class Parasite che estende la classe ParticleAnalyzer
-    * Al suo interno, attraverso gli Override,
-    * si estendono i metodi gia' presenti nella classe ParticleAnalyzer */
+     * Al suo interno, attraverso gli Override,
+     * si estendono i metodi gia' presenti nella classe ParticleAnalyzer */
     class Cells_Analyzer extends ParticleAnalyzer
     {
         int measure = 0;
@@ -454,30 +436,30 @@ public class Seeds_Analysis implements PlugIn
 
         /* CheckBox features morfologiche */
         private boolean doArea, doPerimeter, doFeret, doConvexArea, doConvexPerimeter, doArEquivD,
-        doAspRatio, doPerEquivD, doMINRMAXR,
-        doRoundness, doEquivEllAr, doCompactness,
-        doSolidity, doThinnessRatio, doRFactor,
-        doConvexity, doConcavity, doArBBox,
-        doRectang, doModRatio, doSphericity,
-        doElongation, doNormPeriIndex, doHaralickRatio,
-        doBendingEnergy, doDistanceCMFB,
-        doJaggedness, doEndocarp, doBreadth,
-        doAvgRadius, doVarianceR, doCircularity;
+                doAspRatio, doPerEquivD, doMINRMAXR,
+                doRoundness, doEquivEllAr, doCompactness,
+                doSolidity, doThinnessRatio, doRFactor,
+                doConvexity, doConcavity, doArBBox,
+                doRectang, doModRatio, doSphericity,
+                doElongation, doNormPeriIndex, doHaralickRatio,
+                doBendingEnergy, doDistanceCMFB,
+                doJaggedness, doEndocarp, doBreadth,
+                doAvgRadius, doVarianceR, doCircularity;
 
         /* Feature texturali implementate ex novo da Marta */
         protected boolean[] measuresGrey = new boolean[12];
         /* CheckBox features texturali */
         private boolean doMean, doSkewness, doKurtois,
-        doMode, doMedian, doEntropy, doIntensitySum, doUniformity, doStandardDeviation,
-        doSmothness, doMinandMax, doGLCM;
+                doMode, doMedian, doEntropy, doIntensitySum, doUniformity, doStandardDeviation,
+                doSmothness, doMinandMax, doGLCM;
 
         /* Feature di colore implementate ex novo da Marta */
         protected boolean[] measureRGB = new boolean[16];
         /* CheckBox features di colore */
         private boolean doMeanRed, doMeanGreen, doMeanBlue,
-        doStdDeviationRed, doStdDeviationGreen, doStdDeviationBlue,
-        doSquareRootMeanR, doSquareRootMeanG, doSquareRootMeanB, doAverageRGBcolors,
-        doMeanHue, doMeanSaturation, doMeanBrightness, doStdDeviationHue, doStdDeviationS,doStdDeviationBr;
+                doStdDeviationRed, doStdDeviationGreen, doStdDeviationBlue,
+                doSquareRootMeanR, doSquareRootMeanG, doSquareRootMeanB, doAverageRGBcolors,
+                doMeanHue, doMeanSaturation, doMeanBrightness, doStdDeviationHue, doStdDeviationS,doStdDeviationBr;
 
 
         public Cells_Analyzer(int imageNumber, boolean[] mIJ, boolean[] mBW, boolean[] mG, boolean[] mRGB, int mPhi)
@@ -494,9 +476,9 @@ public class Seeds_Analysis implements PlugIn
         }
 
         /* showDialog:
-        * settaggio della opzione per visualizzare contorni e etichetta numerata
-        * settaggio nelle misure necessarie
-        * richiamo della genericDialog creata per poter settare le misure da aggiungere */
+         * settaggio della opzione per visualizzare contorni e etichetta numerata
+         * settaggio nelle misure necessarie
+         * richiamo della genericDialog creata per poter settare le misure da aggiungere */
         @Override
         public boolean showDialog()
         {
@@ -515,24 +497,10 @@ public class Seeds_Analysis implements PlugIn
             }
             else
             {
-                try{
-                    Robot robot = new Robot();
-                    robot.keyPress(KeyEvent.VK_ALT);
-                    robot.keyPress(KeyEvent.VK_F4);
-                    // Function+F4 is now pressed
-
-                    flag = super.showDialog();
-
-                    robot.keyRelease(KeyEvent.VK_F4);
-                    robot.keyRelease(KeyEvent.VK_ALT);
-                    // Function+F4 now released
-                }
-                catch(Exception e)
-                {
-                    e.printStackTrace();
-                }
+                flag = super.showDialog();
                 flag = dialogSetMeasurements();
                 setMeasurementsExtended();
+
                 return flag;
             }
             return false;
@@ -693,9 +661,10 @@ public class Seeds_Analysis implements PlugIn
         {
             return phi;
         }
+
         /* Metodo della creazione della finestra di dialogo, visualizzazione del:
-        * - checkbox per selezionare ogni misura
-        * - checkbox per selezionare misure singole */
+         * - checkbox per selezionare ogni misura
+         * - checkbox per selezionare misure singole */
         private boolean dialogSetMeasurements()
         {
             boolean spam = false;
@@ -880,12 +849,13 @@ public class Seeds_Analysis implements PlugIn
         }
 
         /* saveResults:
-        * richiamo della funzione originale e aggiunta delle nuove misure */
+         * richiamo della funzione originale e aggiunta delle nuove misure */
         protected void saveResults(ImageStatistics stats, Roi roi)
         {
             super.saveResults(stats, roi);
 
             impGray.setRoi(roi);
+            impGray.show();
             stats = impGray.getAllStatistics();
 
             /*Settaggio delle misure da aggiungere date dalla checkBox*/
@@ -1206,19 +1176,19 @@ public class Seeds_Analysis implements PlugIn
                 ImageStatistics stats_br = impHSB[2].getAllStatistics();
 
                 if(doMeanHue)
-                rt.addValue("Mean H", stats_hu.mean);
+                    rt.addValue("Mean H", stats_hu.mean);
                 if(doStdDeviationHue)
-                rt.addValue("StD H", stats_hu.stdDev);
+                    rt.addValue("StD H", stats_hu.stdDev);
 
                 if(doMeanSaturation)
-                rt.addValue("Mean S", stats_sa.mean);
+                    rt.addValue("Mean S", stats_sa.mean);
                 if(doStdDeviationS)
-                rt.addValue("StD S", stats_sa.stdDev);
+                    rt.addValue("StD S", stats_sa.stdDev);
 
                 if(doMeanBrightness)
-                rt.addValue("Mean V", stats_br.mean);
+                    rt.addValue("Mean V", stats_br.mean);
                 if(doStdDeviationBr)
-                rt.addValue("StD V", stats_br.stdDev);
+                    rt.addValue("StD V", stats_br.stdDev);
             }
         }
 
@@ -1256,7 +1226,7 @@ public class Seeds_Analysis implements PlugIn
             int i;
 
             /*Trasformazione in double dei vettori x e y..
-            * */
+             * */
             double[] x = new double[polygon.npoints];
             for (i = 0; i < x.length; i++) {
                 x[i] = (double) polygon.xpoints[i];
@@ -1268,8 +1238,8 @@ public class Seeds_Analysis implements PlugIn
             }
 
             k = divVector( diffVector ( moltVector( (diff(x)), (diff(diff(y))) ),
-            moltVector( (diff(y)), (diff(diff(x))) ) ),
-            elevationVector( (sumVector( elevationVector(diff(x), 2), elevationVector(diff(y), 2))), 1.5 ) );
+                    moltVector( (diff(y)), (diff(diff(x))) ) ),
+                    elevationVector( (sumVector( elevationVector(diff(x), 2), elevationVector(diff(y), 2))), 1.5 ) );
 
             for (i = 0; i < k.length; i++)
             {
@@ -1283,48 +1253,11 @@ public class Seeds_Analysis implements PlugIn
             return avg/stdDev;
         }
 
-        /* Riguardante il calcolo del Haralick Ratio
-        * Sfruttando la trasformazione in convexHull del roi, si prendono i punti delle coordinate x e y e si lavorano su essi:
-        * ovunque la y abbia un valore uguale si considera la x
-        * purtroppo essi sono disordinati */
-        private double getHaralickRatioOld(Polygon p)
-        {
-            /*Essendo disordinati bisogna scorrere gli array delle x e delle y*/
-            double sumMean = 0.0;
-            /*raccogliera' tutti i raggi*/
-            double[] radii = new double[p.npoints];
-            double media;
-            int xSecond = 0;
-            int numberOfRadius = 0;
-            for (int i = 0; i < p.npoints - 1; i++)
-            {
-                for (int j = i + 1; j < p.npoints - 1; j++)
-                {
-                    if (p.ypoints[j] == p.ypoints[i])
-                    {
-                        if (p.xpoints[i] < p.xpoints[j])
-                        {
-                            xSecond = p.xpoints[j];
-                        }
-                    }
-                }
-                sumMean += (xSecond - p.xpoints[i]) / 2;
-                radii[numberOfRadius] = (xSecond - p.xpoints[i]) / 2;
-                numberOfRadius++;
-            }
-
-            media = sumMean / numberOfRadius;
-            for (int i = 0; i < numberOfRadius; i++)
-            {
-                sumMean += Math.abs((radii[i] - media) * (radii[i] - media));
-            }
-            return media / (Math.sqrt(Math.abs(sumMean / numberOfRadius - 1)));
-        }
-
         private double getEntropy(int[] hist, double area)
         {
             double sum = 0.0;
-            for (int i = 0; i < hist.length; i++) {
+            for(int i = 0; i < hist.length; i++)
+            {
                 if (hist[i] != 0) sum += (double) (hist[i] / area) * log2((double) (hist[i] / area));
             }
 
@@ -1334,7 +1267,8 @@ public class Seeds_Analysis implements PlugIn
         private int getIntensitySum(int[] hist)
         {
             int sum = 0;
-            for (int i = 0; i < hist.length; i++) {
+            for(int i = 0; i < hist.length; i++)
+            {
                 sum += i * hist[i];
             }
             return sum;
@@ -1344,7 +1278,8 @@ public class Seeds_Analysis implements PlugIn
         {
             double uniformity = 0.0;
 
-            for (int i = 0; i < hist.length; i++) {
+            for(int i = 0; i < hist.length; i++)
+            {
                 uniformity += Math.pow(((double) hist[i] / area), 2);
             }
 
@@ -1469,9 +1404,9 @@ public class Seeds_Analysis implements PlugIn
                 radii[i] = distance((int)x_cg, (int)y_cg, p.xpoints[i], p.ypoints[i]);
 
                 if(radii[i] < radiiValues[0])
-                radiiValues[0] = radii[i];
+                    radiiValues[0] = radii[i];
                 if(radii[i] > radiiValues[1])
-                radiiValues[1] = radii[i];
+                    radiiValues[1] = radii[i];
                 sumR += radii[i];
             }
 
@@ -1491,8 +1426,7 @@ public class Seeds_Analysis implements PlugIn
         {
             Point2D.Double pIs = new Point2D.Double(is[0], is[1]);
             Point2D.Double pCg = new Point2D.Double(x_cg, y_cg);
-            double ds = pIs.distance(pCg);
-            return ds;
+            return pIs.distance(pCg);
         }
 
         private double[] getIS(Roi roi)
@@ -1533,6 +1467,7 @@ public class Seeds_Analysis implements PlugIn
 
             return IS;
         }
+
     }
 
     class GLCM implements PlugInFilter
@@ -1547,7 +1482,6 @@ public class Seeds_Analysis implements PlugIn
         boolean doHomogeneity = true;
 
         protected ImageProcessor ip;
-        protected Roi currentRoi;
 
         protected double contrast = 0.0;
         protected double correlation= 0.0;
@@ -1559,7 +1493,7 @@ public class Seeds_Analysis implements PlugIn
         public int setup(String arg, ImagePlus imp)
         {
             if(imp != null)
-            return DONE;
+                return DONE;
 
             return DOES_8G+DOES_STACKS+SUPPORTS_MASKING;
         }

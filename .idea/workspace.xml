@@ -1,148 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="50c88f2b-0a33-4fe9-bc2c-de2f35435265" name="Default" comment="" />
-    <ignored path="$PROJECT_DIR$/out/" />
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
-    <option name="TRACKING_ENABLED" value="true" />
+    <list default="true" id="50c88f2b-0a33-4fe9-bc2c-de2f35435265" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/project-intellij/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/project-intellij/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/extras/Images/Alicante 1B057.tif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/ij.jar" beforeDir="false" afterPath="$PROJECT_DIR$/project-intellij/ij.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/plugins/GLCM_TextureToo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/plugins/Seeds_Analysis$Cells_Analyzer.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/plugins/Seeds_Analysis$GLCM.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/plugins/Seeds_Analysis.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/plugins/Seeds_Analysis.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/AutoThresholdingDemo.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/Batch_GLCM_Measure.ijm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/Catalogue_Particles.ijm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/Catch_Cells.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/Demo_Plugin.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/GLCM_Texture.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/GLCM_TextureToo.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/Particles8_.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/Run_Macro.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/_GD Ritaglia Immagini 5.ijm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/_GD_ex Unisci Immagini 5.ijm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/_Test.ijm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/fourier2.5_.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/fourier2.5_/EllipticFD.ijm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/fourier2.5_/FourierD/EllipticFD.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/fourier2.5_/FourierD/EllipticFD.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/fourier2.5_/FourierD/EllipticFD_.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/fourier2.5_/FourierD/EllipticFD_.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/fourier2.5_/FourierD/Fourier.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/fourier2.5_/FourierD/Fourier_.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/fourier2.5_/FourierD/Fourier_.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/fourier2.5_/FourierD/Point2d.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/ExamplePlugins/fourier2.5_/plugins.config" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java" beforeDir="false" afterPath="$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/Test/Results/aaa.tif" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/backBlue_Lote_v5.java" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="Seeds_Analysis.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4144">
-              <caret line="434" column="10" selection-start-line="434" selection-start-column="10" selection-end-line="434" selection-end-column="10" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+  <component name="CodeStyleSettingsInfer">
+    <option name="done" value="true" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java" />
-      </list>
-    </option>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="1" />
   </component>
-  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
-  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
-  <component name="JsGulpfileManager">
-    <detection-done>true</detection-done>
-    <sorting>DEFINITION_ORDER</sorting>
-  </component>
-  <component name="NodePackageJsonFileManager">
-    <packageJsonPaths />
-  </component>
-  <component name="ProjectFrameBounds">
-    <option name="y" value="23" />
-    <option name="width" value="1440" />
-    <option name="height" value="810" />
-  </component>
+  <component name="ProjectId" id="1XnsgK19ErG3r3pGVkiCB49By6e" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="imagej-plugins-ide-builder" type="b2602c69:ProjectViewProjectNode" />
-              <item name="project-intellij" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="imagej-plugins-ide-builder" type="b2602c69:ProjectViewProjectNode" />
-              <item name="project-intellij" type="462c0819:PsiDirectoryNode" />
-              <item name="plugins" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="imagej-plugins-ide-builder" type="b2602c69:ProjectViewProjectNode" />
-              <item name="project-intellij" type="462c0819:PsiDirectoryNode" />
-              <item name="src-plugins" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
-      <pane id="AndroidView" />
-    </panes>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
+  <component name="RecentsManager">
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
   </component>
   <component name="RunManager">
-    <configuration name="ImageJ" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="net.imagej.Main" />
-      <module name="project-intellij" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-    </configuration>
     <configuration default="true" type="Application" factoryName="Application">
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
       <option name="TEST_OBJECT" value="class" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <patterns />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
-    <configuration default="true" type="TestNG" factoryName="TestNG">
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="SUITE_NAME" />
-      <option name="PACKAGE_NAME" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="METHOD_NAME" />
-      <option name="GROUP_NAME" />
+    <configuration default="true" type="TestNG">
       <option name="TEST_OBJECT" value="CLASS" />
-      <option name="VM_PARAMETERS" value="-ea" />
-      <option name="PARAMETERS" />
       <option name="WORKING_DIRECTORY" value="%MODULE_WORKING_DIR%" />
-      <option name="OUTPUT_DIRECTORY" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <option name="TEST_SEARCH_SCOPE">
-        <value defaultName="singleModule" />
-      </option>
-      <option name="USE_DEFAULT_REPORTERS" value="false" />
-      <option name="PROPERTIES_FILE" />
       <properties />
       <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
     </configuration>
   </component>
   <component name="SvnConfiguration">
@@ -158,66 +127,70 @@
       <workItem from="1562658443193" duration="314000" />
       <workItem from="1562660930793" duration="270000" />
       <workItem from="1564038262568" duration="6000" />
+      <workItem from="1581693304131" duration="14916000" />
     </task>
     <servers />
-  </component>
-  <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="590000" />
-  </component>
-  <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="810" extended-state="0" />
-    <editor active="true" />
-    <layout>
-      <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Palette&#9;" order="3" />
-      <window_info id="Image Layers" order="2" />
-      <window_info anchor="right" id="Capture Analysis" order="3" />
-      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
-      <window_info anchor="right" id="Maven Projects" order="3" />
-      <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="7" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32880434" />
-      <window_info id="Capture Tool" order="2" />
-      <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
-      <window_info anchor="right" id="Database" order="3" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info id="UI Designer" order="2" />
-      <window_info anchor="right" id="Theme Preview" order="3" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32880434" />
-    </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
-  <component name="VcsContentAnnotationSettings">
-    <option name="myLimit" value="2678400000" />
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2730">
-          <caret line="182" column="10" lean-forward="true" selection-start-line="182" selection-start-column="10" selection-end-line="182" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4144">
-          <caret line="434" column="10" selection-start-line="434" selection-start-column="10" selection-end-line="434" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
+  <component name="WindowStateProjectService">
+    <state x="4254" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1581700961266">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state x="4254" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581700961266" />
+    <state x="4605" y="229" key="#com.intellij.ide.util.MemberChooser" timestamp="1581704322975">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state x="4605" y="229" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581704322975" />
+    <state x="4638" y="409" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog" timestamp="1581693334185">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state x="4638" y="409" key="#com.intellij.ide.util.projectWizard.JdkChooserPanel.MyDialog/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581693334185" />
+    <state x="4596" y="379" width="408" height="288" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1581698244904">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state x="4596" y="379" width="408" height="288" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581698244904" />
+    <state x="4580" y="275" key="FileChooserDialogImpl" timestamp="1581700981734">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state x="4580" y="275" key="FileChooserDialogImpl/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581700981734" />
+    <state width="1877" height="348" key="GridCell.Tab.0.bottom" timestamp="1581708872902">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="348" key="GridCell.Tab.0.bottom/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581708872902" />
+    <state width="1877" height="348" key="GridCell.Tab.0.center" timestamp="1581708872902">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="348" key="GridCell.Tab.0.center/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581708872902" />
+    <state width="1877" height="348" key="GridCell.Tab.0.left" timestamp="1581708872902">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="348" key="GridCell.Tab.0.left/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581708872902" />
+    <state width="1877" height="348" key="GridCell.Tab.0.right" timestamp="1581708872902">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="348" key="GridCell.Tab.0.right/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581708872902" />
+    <state width="1877" height="348" key="GridCell.Tab.1.bottom" timestamp="1581708872902">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="348" key="GridCell.Tab.1.bottom/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581708872902" />
+    <state width="1877" height="348" key="GridCell.Tab.1.center" timestamp="1581708872902">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="348" key="GridCell.Tab.1.center/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581708872902" />
+    <state width="1877" height="348" key="GridCell.Tab.1.left" timestamp="1581708872902">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="348" key="GridCell.Tab.1.left/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581708872902" />
+    <state width="1877" height="348" key="GridCell.Tab.1.right" timestamp="1581708872902">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="348" key="GridCell.Tab.1.right/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581708872902" />
+    <state x="4609" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1581701583306">
+      <screen x="3840" y="0" width="1920" height="1040" />
+    </state>
+    <state x="4609" y="437" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824/3840.0.1920.1040@3840.0.1920.1040" timestamp="1581701583306" />
   </component>
   <component name="masterDetails">
     <states>

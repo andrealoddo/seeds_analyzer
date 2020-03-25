@@ -1,11 +1,9 @@
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
-import ij.Macro;
 import ij.gui.GenericDialog;
 import ij.gui.Roi;
 import ij.io.OpenDialog;
-import ij.measure.Calibration;
 import ij.plugin.ChannelSplitter;
 import ij.plugin.Duplicator;
 import ij.plugin.ImageCalculator;
@@ -14,11 +12,11 @@ import ij.plugin.filter.Analyzer;
 import ij.plugin.filter.ParticleAnalyzer;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ColorProcessor;
+import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,13 +39,15 @@ public class Seeds_Analysis implements PlugIn
 
     /*  Attributes */
     protected ImagePlus impLightBackground, impDarkBackground, impLightBackgroundOriginal;
+    protected ImagePlus mask;
     protected ImagePlus imp;
     protected ImagePlus impColor;
     protected ImagePlus impGray;
     protected ImagePlus[] impRGB;
     protected ImagePlus[] impHSB;
-    protected ImageProcessor ipColor, ipGray;
+    protected ImageProcessor ipColor, ipGray, ip;
     protected ImageProcessor ipLightBackground, ipDarkBackground;
+    protected ImageProcessor ipMask;
     protected boolean typeGray, typeRGB;
     protected Cells_Analyzer cells_analyzer;
     protected GLCM glcm;
@@ -265,9 +265,12 @@ public class Seeds_Analysis implements PlugIn
 
                 ImageCalculator ic = new ImageCalculator();
                 imp = ic.run("OR create", impLightBackground, impDarkBackground);
-                IJ.run("Open");
-                imp = ic.run("AND create", impLightBackgroundOriginal, imp);
+                mask = new Duplicator().run(imp);
+                ip = imp.getProcessor();
+                ip.setAutoThreshold("Otsu b&w");
+                IJ.run("Convert to Mask");
                 imp = ic.run("OR create", impLightBackgroundOriginal, imp);
+                //imp = ic.run("OR create", impLightBackgroundOriginal, imp);
                 impColor = (ImagePlus) imp.clone();
                 ipColor = impColor.getProcessor();
                 col = ipColor.getWidth();
@@ -277,36 +280,22 @@ public class Seeds_Analysis implements PlugIn
                 imp.show();
 
                 IJ.run("8-bit");
-                impGray = new Duplicator().run(imp);
+                impGray = new Duplicator().run(impLightBackgroundOriginal);
                 ipGray = imp.getProcessor();
 
-                ipColor.setAutoThreshold("Otsu");
+                ImageConverter ico = new ImageConverter(impGray);
+                ico.convertToGray8();
 
-                IJ.run("Convert to Mask");
+                ip = imp.getProcessor();
+                ip.setAutoThreshold("Otsu b&w");
+
                 IJ.run("Make Binary");
+                IJ.run("Convert to Mask");
                 IJ.run("Fill Holes");
 
                 // TODO aggiungere filtro regioni più piccole di un terzo della media delle regioni
                 int RGBValues[] = {0, 0, 0};
-/*
-                // background extraction
-                cpRGB = (ColorProcessor) ipColor;
-                for(j=0; j<col; j++)
-                {
-                    for(i=0; i<lin; i++)
-                    {
-                        RGBValues = cpRGB.getPixel(j, i, RGB);
-                        if(RGBValues[R] == 0 && RGBValues[G] == 0 && RGBValues[B] == 0) // pixel nero = sfondo
-                        {
-                            ipGray.putPixel(j, i, 0);
-                        }
-                        else
-                        {
-                            ipGray.putPixel(j, i, 255);
-                        }
-                    }
-                }
-*/
+
                 if(impColor.getType() == ImagePlus.COLOR_RGB)
                 {
                     typeRGB = true;
@@ -491,7 +480,6 @@ public class Seeds_Analysis implements PlugIn
                 {
                     flag = dialogSetMeasurements();
                     setMeasurementsExtended();
-                    //Analyzer.setMeasurements(measure);
                     return flag;
                 }
             }
@@ -855,7 +843,6 @@ public class Seeds_Analysis implements PlugIn
             super.saveResults(stats, roi);
 
             impGray.setRoi(roi);
-            impGray.show();
             stats = impGray.getAllStatistics();
 
             /*Settaggio delle misure da aggiungere date dalla checkBox*/
@@ -1705,7 +1692,7 @@ public class Seeds_Analysis implements PlugIn
             // calculate the contrast (Haralick, et al. 1973)
             // similar to the inertia, except abs(i-j) is used
 
-            if(doContrast == true)
+            if(doContrast)
             {
                 contrast = 0.0;
                 for (int i=0; i<256; i++)
@@ -1717,7 +1704,7 @@ public class Seeds_Analysis implements PlugIn
                 }
             }
 
-            if(doCorrelation == true)
+            if(doCorrelation)
             {
                 correlation = 0.0;
 
@@ -1731,114 +1718,8 @@ public class Seeds_Analysis implements PlugIn
                 }
             }
 
-            // Correlation test version 2
-            if(doCorrelation == false)
-            {
-                IJ.log("v2");
-                correlation = 0.0;
-                int rowN = 256;
-                int colN = 256;
-                int n_terms = rowN*colN;
-                double[] r1 = new double[n_terms];
-                double[] c = new double[n_terms];
-                double[] vertGLCM = new double[n_terms];
-                double[] mr = new double[n_terms];
-                double[] term1 = new double[n_terms];
-                double[] mc = new double[n_terms];
-                int val = 0;
-                int n = 0;
-                double sum_mr = 0.0;
-                double sr = 0.0;
-                double sum_mc = 0.0;
-                double sc = 0;
-                double term2 = 0.0;
-
-
-                for(int k=0; k<rowN*colN; k+=rowN)
-                {
-                    for(int i=0; i<rowN; i++)
-                    {
-                        r1[i+k] = i;
-                    }
-                }
-
-                for(int k=0; k<rowN*colN; k+=rowN)
-                {
-                    for(int i=0; i<colN; i++)
-                    {
-                        c[i+k] = val;
-                    }
-                    val++;
-                }
-
-                for(int rr=0; rr<rowN; rr++)
-                {
-                    for(int cc=0; cc<colN; cc++)
-                    {
-                        vertGLCM[n] = glcm[rr][cc];
-                        n++;
-                    }
-                }
-
-                for(int i=0; i<rowN*colN; i++)
-                {
-                    mr[i] = r1[i]*vertGLCM[i];
-                }
-
-
-                for(int i=0; i<rowN*colN; i++)
-                {
-                    sum_mr = sum_mr + mr[i];
-                }
-
-                for(int i=0; i<rowN*colN; i++)
-                {
-                    term1[i] = (r1[i] - sum_mr) * (r1[i] - sum_mr) * vertGLCM[i];
-                }
-
-                for(int i=0; i<rowN*colN; i++)
-                {
-                    sr = sr + term1[i];
-                }
-                sr = Math.sqrt(sr);
-
-                for(int i=0; i<rowN*colN; i++)
-                {
-                    mc[i] = c[i] * vertGLCM[i];
-                }
-
-                for(int i=0; i<rowN*colN; i++)
-                {
-                    sum_mc = sum_mc + mc[i];
-                }
-
-                for(int i=0; i<rowN*colN; i++)
-                {
-                    term1[i] = (c[i] - sum_mc) * (c[i] - sum_mc) * vertGLCM[i];
-                }
-
-                for(int i=0; i<rowN*colN; i++)
-                {
-                    sc = sc + term1[i];
-                }
-                sc = Math.sqrt(sc);
-
-                for(int i=0; i<rowN*colN; i++)
-                {
-                    term1[i] =  (r1[i] - sum_mr) * (c[i] - sum_mc) * vertGLCM[i];
-                }
-
-                for(int i=0; i<rowN*colN; i++)
-                {
-                    term2 = term2 + term1[i];
-                }
-
-                correlation = term2 / (sr * sc);
-
-            }
-
             // calculate the energy
-            if(doEnergy == true)
+            if(doEnergy)
             {
                 energy = 0.0;
                 for (int i=0; i<256; i++)
@@ -1853,7 +1734,7 @@ public class Seeds_Analysis implements PlugIn
             // calculate the homogeneity (Parker)
             // "Local Homogeneity" from Conners, et al., 1984 is calculated the same as IDM above
             // Parker's implementation is below; absolute value of i-j is taken rather than square
-            if(doHomogeneity == true)
+            if(doHomogeneity)
             {
                 homogeneity = 0.0;
                 for(int i=0; i<256; i++)

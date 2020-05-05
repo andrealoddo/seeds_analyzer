@@ -62,6 +62,7 @@ public class Seeds_Analysis implements PlugIn
     protected int R = 0, G = 1, B = 2;
 
     protected boolean measurementsAlreadySet = false;
+    protected String currentFilename;
 
     protected boolean[] mIJ = new boolean[3];
     protected boolean[] mBW = new boolean[29];
@@ -186,7 +187,7 @@ public class Seeds_Analysis implements PlugIn
                     typeGray = true;
                 }
 
-                cells_analyzer = new Cells_Analyzer(k, mIJ, mBW, mG, mRGB, mPhi);
+                cells_analyzer = new Cells_Analyzer(k, mIJ, mBW, mG, mRGB, mPhi, fileName);
                 glcm = new GLCM(impGray);
 
                 flags = cells_analyzer.setup("", imp);
@@ -235,7 +236,7 @@ public class Seeds_Analysis implements PlugIn
 
             qtd = result.size();
 
-            String[] fileNames = new String[qtd];
+            String fileNames[] = new String[qtd];
 
             for(k=0; k<qtd; k+=2)
             {
@@ -308,7 +309,7 @@ public class Seeds_Analysis implements PlugIn
                     typeGray = true;
                 }
 
-                cells_analyzer = new Cells_Analyzer(k, mIJ, mBW, mG, mRGB, mPhi);
+                cells_analyzer = new Cells_Analyzer(k, mIJ, mBW, mG, mRGB, mPhi, fileName);
                 glcm = new GLCM(impGray);
 
                 flags = cells_analyzer.setup("", imp);
@@ -451,8 +452,11 @@ public class Seeds_Analysis implements PlugIn
                 doMeanHue, doMeanSaturation, doMeanBrightness, doStdDeviationHue, doStdDeviationS,doStdDeviationBr;
 
 
-        public Cells_Analyzer(int imageNumber, boolean[] mIJ, boolean[] mBW, boolean[] mG, boolean[] mRGB, int mPhi)
+        public Cells_Analyzer(int imageNumber, boolean[] mIJ, boolean[] mBW, boolean[] mG, boolean[] mRGB, int mPhi, String mfileName)
         {
+
+            currentFilename = mfileName;
+
             if(imageNumber > 0)
             {
                 measurementsAlreadySet = true;
@@ -856,6 +860,8 @@ public class Seeds_Analysis implements PlugIn
             double convexArea = getArea(polygon);
             double convexPerimeter = getPerimeter(polygon);
             int[] hist = stats.histogram;
+
+            rt.addValue("Label", currentFilename);
 
             if(doArea)
             {

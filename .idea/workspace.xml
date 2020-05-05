@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="50c88f2b-0a33-4fe9-bc2c-de2f35435265" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java" beforeDir="false" afterPath="$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis_old.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/Test/Results/1_002.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/ImageJ.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/project-intellij/ImageJ.cfg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java" beforeDir="false" afterPath="$PROJECT_DIR$/project-intellij/src-plugins/Seeds_Analysis.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,6 +99,9 @@
       <workItem from="1582825437887" duration="610000" />
       <workItem from="1583744496323" duration="9000" />
       <workItem from="1585148115537" duration="1475000" />
+      <workItem from="1588064732797" duration="4000" />
+      <workItem from="1588673513328" duration="4000" />
+      <workItem from="1588685239926" duration="3951000" />
     </task>
     <servers />
   </component>

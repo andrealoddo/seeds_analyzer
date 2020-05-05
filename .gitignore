@@ -2,3 +2,7 @@
 project-intellij/ij.jar
 project-intellij/ImageJ.cfg
 *.class
+project-intellij/ImageJ.cfg
+project-intellij/plugins/Seeds_Analysis.java
+project-intellij/ImageJ.cfg
+.idea/workspace.xml

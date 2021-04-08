@@ -170,7 +170,7 @@ public class Seeds_Analysis implements PlugIn
                     }
                 }
 
-                ipColor.setAutoThreshold("Otsu");
+                //ipColor.setAutoThreshold("Otsu");
                 IJ.run("Convert to Mask");
                 IJ.run("Make Binary");
                 IJ.run("Fill Holes");
@@ -180,7 +180,6 @@ public class Seeds_Analysis implements PlugIn
                     typeRGB = true;
                     impRGB = ChannelSplitter.split(impColor);
                     impHSB = getImagePlusHSB(impColor);
-
                 }
                 else
                 {

@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import java.io.File;
+
 import static java.lang.Thread.MIN_PRIORITY;
 
 /*
@@ -43,6 +45,7 @@ public class Seeds_Analysis implements PlugIn
     protected ImagePlus imp;
     protected ImagePlus impColor;
     protected ImagePlus impGray;
+    protected ImagePlus impSegm;
     protected ImagePlus[] impRGB;
     protected ImagePlus[] impHSB;
     protected ImageProcessor ipColor, ipGray, ip;
@@ -73,12 +76,16 @@ public class Seeds_Analysis implements PlugIn
     public void readImages()
     {
 
-        String directory, fileName;
+        String directory, fileName, resultsDirectory;
         List<String> result;
+        File resultsDir;
         int k, qtd = 0;
 
         OpenDialog od = new OpenDialog("Selezionare a file among those to analyse", null);
         directory = od.getDirectory();
+        resultsDirectory = directory + "results" + File.separator;
+        resultsDir = new File(resultsDirectory);
+        resultsDir.mkdir();
 
         if(null == directory)
         {
@@ -93,6 +100,10 @@ public class Seeds_Analysis implements PlugIn
             walk.close();
 
             qtd = result.size();
+
+      			ImagePlus impColors[] = new ImagePlus[qtd];
+      			ImagePlus impGrays[] = new ImagePlus[qtd];
+      			ImagePlus impSegms[] = new ImagePlus[qtd];
 
             String fileNames[] = new String[qtd];
 
@@ -109,12 +120,14 @@ public class Seeds_Analysis implements PlugIn
                 imp = IJ.getImage();
 
                 impColor = (ImagePlus) imp.clone();
+                impColors[k] = (ImagePlus) imp.clone(); // for saving file
                 ipColor = imp.getProcessor();
                 col = ipColor.getWidth();
                 lin = ipColor.getHeight();
 
                 IJ.run("8-bit");
                 impGray = new Duplicator().run(imp);
+        				impGrays[k] = new Duplicator().run(imp);  // for saving file
                 ipGray = imp.getProcessor();
 
                 // flag - red edges
@@ -170,16 +183,19 @@ public class Seeds_Analysis implements PlugIn
                     }
                 }
 
-                //ipColor.setAutoThreshold("Otsu");
+                ipColor.setAutoThreshold("Otsu");
                 IJ.run("Convert to Mask");
                 IJ.run("Make Binary");
                 IJ.run("Fill Holes");
+                imp = IJ.getImage();
+                impSegms[k] = new Duplicator().run(imp);  // for saving BW mask
 
                 if(impColor.getType() == ImagePlus.COLOR_RGB)
                 {
                     typeRGB = true;
                     impRGB = ChannelSplitter.split(impColor);
                     impHSB = getImagePlusHSB(impColor);
+
                 }
                 else
                 {
@@ -197,12 +213,21 @@ public class Seeds_Analysis implements PlugIn
 
                 cells_analyzer.run(imp.getProcessor());
                 Analyzer.getResultsTable().show("Results");
+
                 IJ.run("Close All");
                 mIJ = cells_analyzer.getMeasuresImageJ();
                 mBW = cells_analyzer.getMeasuresBW();
                 mG = cells_analyzer.getMeasuresGray();
                 mRGB = cells_analyzer.getMeasuresRGB();
                 mPhi = cells_analyzer.getPhi();
+            }
+
+            /* Save all the required segmentation masks */
+            for (k=0; k<qtd; k++)
+            {
+              IJ.saveAs(impColors[k], "Jpeg", resultsDirectory+fileNames[k]+"_Color"); // Original color images
+              IJ.saveAs(impGrays[k], "Jpeg", resultsDirectory+fileNames[k]+"_Gray");  // Gray scale images
+              IJ.saveAs(impSegms[k], "tiff", resultsDirectory+fileNames[k]+"_BWMask");  // Segmentation images (masks TIFF)
             }
 
         }
@@ -319,6 +344,7 @@ public class Seeds_Analysis implements PlugIn
 
                 cells_analyzer.run(imp.getProcessor());
                 Analyzer.getResultsTable().show("Results");
+
                 IJ.run("Close All");
                 mIJ = cells_analyzer.getMeasuresImageJ();
                 mBW = cells_analyzer.getMeasuresBW();
